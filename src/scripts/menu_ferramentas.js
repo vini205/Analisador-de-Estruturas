@@ -41,5 +41,5 @@ btnApagar.addEventListener('click',()=>{
             const modalElement = document.getElementById('eraseGridModal');
             const modalInstance = bootstrap.Modal.getInstance(modalElement);
             modalInstance.hide();
-        }
+        } 
 })

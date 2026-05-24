@@ -1,4 +1,4 @@
-//Grelha!!!
+//Grelha!!!;
 
 // 1. Pegamos o tamanho da tela
 const width = (window.innerWidth) * 0.8;
@@ -20,11 +20,11 @@ const stage = new Konva.Stage({
 });
 
 // NOVA CAMADA: Camada da Estrutura (barras, forças, apoios)
+const layerGrelha = new Konva.Layer();
+stage.add(layerGrelha);
 const layerEstrutura = new Konva.Layer(); 
 stage.add(layerEstrutura);
 
-const layerGrelha = new Konva.Layer();
-stage.add(layerGrelha);
 
 window.addEventListener('resize',()=>{
     stage.width(window.innerWidth * 0.8);
@@ -167,30 +167,76 @@ function desenharGrelha() {
                                 const comprimento = Math.sqrt(dx*dx + dy*dy).toFixed(2);
                                 const angulo = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(1);
 
-                                // Cria o balão de texto (Tooltip) com a informação
-                                tooltipInspecao = new Konva.Label({
-                                    x: (pts[0] + pts[2]) / 2, // Posiciona no meio da barra
-                                    y: (pts[1] + pts[3]) / 2 - 15,
-                                    opacity: 0.95
+                                
+                                 // Cria o balão de texto (Tooltip) com a informação
+                                tooltipInspecao = new Konva.Group({
+                                    x: (pts[0] + pts[2]) / 2, 
+                                    y: (pts[1] + pts[3]) / 2 - 30, 
                                 });
-                                
-                                tooltipInspecao.add(new Konva.Tag({
+
+                                const fundoTooltip = new Konva.Rect({
+                                    x: -50,
+                                    y: -35,
+                                    width: 100,
+                                    height: 65,
+                                    fill: '#343a40d4',
+                                    cornerRadius: 6,
+                                    shadowColor: 'black',
+                                    shadowBlur: 4,
+                                    shadowOpacity: 0.3,
+                                    shadowOffset: { x: 0, y: 2 }
+                                });
+                                const ponta = new Konva.Line({
+                                    points: [-6, 30, 6, 30, 0, 38], 
                                     fill: '#343a40',
-                                    pointerDirection: 'down',
-                                    pointerWidth: 10,
-                                    pointerHeight: 10,
-                                    cornerRadius: 4
-                                }));
-                                
-                                tooltipInspecao.add(new Konva.Text({
+                                    closed: true
+                                });
+                                const infoTexto = new Konva.Text({
+                                    x: -50,
+                                    y: -28,
                                     text: `L: ${comprimento}m\nθ: ${angulo}°`,
                                     fontFamily: 'Arial',
                                     fontSize: 13,
-                                    padding: 8,
-                                    fill: 'white'
-                                }));
+                                    fill: 'white',
+                                    width: 100,
+                                    align: 'center',
+                                    lineHeight: 1.3
+                                });
+                                const botaoApagarGrupo = new Konva.Group({
+                                    x: -35, 
+                                    y: 8,
+                                    listening: true
+                                });
 
+                                const fundoBotao = new Konva.Rect({
+                                    width: 70,
+                                    height: 18,
+                                    fill: '#dc3545',
+                                    cornerRadius: 3
+                                });
+                                const textoBotao = new Konva.Text({
+                                    text: 'Apagar',
+                                    width: 70,
+                                    height: 18,
+                                    fontFamily: 'Arial',
+                                    fontSize: 11,
+                                    fontStyle: 'bold',
+                                    fill: 'white',
+                                    align: 'center',
+                                    verticalAlign: 'middle'
+                                });
+                                botaoApagarGrupo.add(fundoBotao, textoBotao);
+                                botaoApagarGrupo.on('click tap', function(e) {
+                                    e.cancelBubble = true; 
+                                    apagarBarra()
+                                });
+
+                                botaoApagarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
+                                botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
+
+                                tooltipInspecao.add(fundoTooltip, ponta, infoTexto, botaoApagarGrupo);
                                 layerEstrutura.add(tooltipInspecao);
+                                tooltipInspecao.moveToTop();
                                 layerEstrutura.draw();
                                 
                                 console.log(`🔍 Inspeção - Comprimento: ${comprimento} | Ângulo: ${angulo}°`);
@@ -309,7 +355,13 @@ function desenharGrelha() {
 // --- LÓGICA DE EXCLUSÃO PELO TECLADO (Delete ou Backspace) ---
 document.addEventListener('keydown', function(event) {
     if ((event.key === 'Delete' || event.key === 'Backspace') && window.ferramentaAtual === 'Selecionar') {
-        if (window.barraSelecionada) {
+       apagarBarra();
+    }
+});
+
+
+function apagarBarra() {
+    if (window.barraSelecionada) {
             window.barraSelecionada.destroy(); // Remove a barra do Konva
             window.barraSelecionada = null;
             
@@ -320,12 +372,8 @@ document.addEventListener('keydown', function(event) {
             
             layerEstrutura.draw();
             console.log("Barra excluída com sucesso!");
-        }
     }
-});
-
-
-
+}
 
 //__________ Botao Apagar Menu Ferramentas _________________//
 
