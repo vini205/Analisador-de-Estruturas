@@ -1,0 +1,127 @@
+#container{
+    position: absolute;
+    left:50%;
+    transform: translate(-50%);
+}
+
+/* Container que centraliza o menu abaixo do canvas */
+.toolbar-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 15px 0;
+    background-color: #f8f9fa; /* Fundo cinza bem claro para destacar do canvas */
+    border-top: 1px solid #dee2e6;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* A barra de ferramentas em si */
+.structural-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra suave profissional */
+    border: 1px solid #ced4da;
+}
+
+/* Estilo de cada botão do menu */
+.toolbar-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 75px;
+    height: 65px;
+    background: none;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #495057; /* Cor cinza escuro para os ícones */
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+/* Tamanho dos ícones SVG */
+.toolbar-btn svg {
+    width: 24px;
+    height: 24px;
+    margin-bottom: 4px;
+}
+
+/* Texto abaixo do ícone */
+.toolbar-btn span {
+    font-size: 11px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 500;
+}
+
+/* Efeito de passar o mouse (Hover) */
+.toolbar-btn:hover {
+    background-color: #e9ecef;
+    color: #0d6efd; /* Azul do Bootstrap ao passar o mouse */
+}
+
+/* Estado ATIVO (Quando a ferramenta está selecionada) */
+.toolbar-btn.active {
+    background-color: #e7f1ff;
+    border-color: #9ec5fe;
+    color: #0a58ca; /* Azul forte indicando seleção */
+}
+
+/* Estilo especial para o botão de apagar */
+.toolbar-btn.btn-delete:hover {
+    background-color: #fff5f5;
+    color: #dc3545; /* Vermelho de alerta */
+}
+
+/* Divisor vertical entre grupos de ferramentas */
+.toolbar-divider {
+    width: 1px;
+    height: 40px;
+    background-color: #dee2e6;
+    margin: 0 4px;
+}
+
+
+
+
+/* menu */
+
+/* --- COMPORTAMENTO DO CABEÇALHO (Ocultar/Aparecer) --- */
+
+header.container-fluid {
+    /* Tira o header do fluxo da página, fazendo ele flutuar sobre tudo */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1050; /* Z-index alto (padrão Bootstrap) para ficar acima do canvas Konva */
+    
+    /* Esconde o cabeçalho puxando-o 100% da sua própria altura para cima */
+    transform: translateY(-100%);
+    
+    /* Cria uma animação suave de descida e subida */
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* O TRUQUE MÁGICO:
+  Como o cabeçalho subiu 100%, o mouse não alcança ele.
+  Criamos uma "zona de gatilho" invisível de 25px de altura grudada na parte de baixo do cabeçalho.
+  Essa zona invisível ficará exatamente no topo da sua tela esperando o mouse!
+*/
+header.container-fluid::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    height: 25px; 
+    background: transparent; 
+}
+
+/* Quando o mouse entra na zona invisível (ou no próprio cabeçalho), ele volta à posição 0 (desce) */
+header.container-fluid:hover {
+    transform: translateY(0);
+}
