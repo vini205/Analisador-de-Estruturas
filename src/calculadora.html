@@ -104,7 +104,7 @@
 
         <div class="toolbar-divider"></div>
 
-        <button class="toolbar-btn btn-delete" title="Apagar Elemento">
+        <button type="button" class="toolbar-btn btn-delete" data-bs-toggle="modal" data-bs-target="#eraseGridModal" title="Apagar Elemento">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/>
             </svg>
@@ -119,13 +119,31 @@
 
 
 
-
     <footer class=" mt-5 container-fluid p-4 bg-dark text-white text-center">
     <div class="row">
         <p class="col">Column 01</p>
         <p class="col">Clumn 02</p>
     </div>
     </footer>
+
+    <!-- MODAL -->
+<div class="modal fade" id="eraseGridModal" tabindex="-1" role="dialog" aria-labelledby="eraseGridModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eraseGridModalLabel">Confirmação</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Você tem certeza que deseja apagar este elemento?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" id="confirmarApagarGrelha" class="btn btn-danger">Apagar</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <script src="scripts/menu_ferramentas.js"></script>
     <script src="scripts/grelha.js"> </script>    

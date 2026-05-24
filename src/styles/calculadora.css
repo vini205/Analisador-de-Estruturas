@@ -89,28 +89,18 @@
 
 /* menu */
 
-/* --- COMPORTAMENTO DO CABEÇALHO (Ocultar/Aparecer) --- */
-
 header.container-fluid {
-    /* Tira o header do fluxo da página, fazendo ele flutuar sobre tudo */
     position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1050; /* Z-index alto (padrão Bootstrap) para ficar acima do canvas Konva */
-    
-    /* Esconde o cabeçalho puxando-o 100% da sua própria altura para cima */
+    /* top: 1000;
+    left: 40; */
+    /*right: 0*/
+    z-index: 10; /* 1050*/    
     transform: translateY(-100%);
     
     /* Cria uma animação suave de descida e subida */
     transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* O TRUQUE MÁGICO:
-  Como o cabeçalho subiu 100%, o mouse não alcança ele.
-  Criamos uma "zona de gatilho" invisível de 25px de altura grudada na parte de baixo do cabeçalho.
-  Essa zona invisível ficará exatamente no topo da sua tela esperando o mouse!
-*/
 header.container-fluid::after {
     content: "";
     position: absolute;
@@ -121,7 +111,6 @@ header.container-fluid::after {
     background: transparent; 
 }
 
-/* Quando o mouse entra na zona invisível (ou no próprio cabeçalho), ele volta à posição 0 (desce) */
 header.container-fluid:hover {
     transform: translateY(0);
 }

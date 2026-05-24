@@ -21,24 +21,25 @@ botoesMenu.forEach(botao => {
             window.cancelarDesenhoBarra();
         }
 
-        // --- LÓGICA EXCLUSIVA DO BOTÃO APAGAR TUDO ---
-        if (window.ferramentaAtual === 'Apagar') {
-            
-            // Uma caixinha de segurança do navegador pergunta se ele tem certeza
-            const confirmar = confirm("Tem certeza que deseja apagar toda a estrutura? Esta ação não pode ser desfeita.");
-            
-            if (confirmar && typeof window.apagarTodaEstrutura === 'function') {
-                window.apagarTodaEstrutura();
-            }
-            
-            // Detalhe de Ouro (UX): Como ele já apagou tudo, não faz sentido continuar na ferramenta "Apagar".
-            // Nós forçamos um clique no botão "Selecionar" para voltar ao modo seguro automaticamente.
-            const botaoSelecionar = document.querySelector('[title="Selecionar (Mover)"]');
-            if (botaoSelecionar) {
-                botaoSelecionar.click(); 
-            }
-        }
         
         console.log("🛠️ Ferramenta ativa:", window.ferramentaAtual);
     });
 });
+
+const btnApagar = document.querySelector('#confirmarApagarGrelha')
+btnApagar.addEventListener('click',()=>{
+    // --- APAGAR TUDO ---
+        if (window.ferramentaAtual === 'Apagar') {
+
+            window.apagarTodaEstrutura();
+            
+            // Nós forçamos um clique no botão "Selecionar" 
+            const botaoSelecionar = document.querySelector('[title="Selecionar (Mover)"]');
+            if (botaoSelecionar) {
+                botaoSelecionar.click(); 
+            }
+            const modalElement = document.getElementById('eraseGridModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+        }
+})
