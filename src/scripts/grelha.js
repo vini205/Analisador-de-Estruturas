@@ -21,9 +21,9 @@ const stage = new Konva.Stage({
 
 // NOVA CAMADA: Camada da Estrutura (barras, forças, apoios)
 const layerGrelha = new Konva.Layer();
-stage.add(layerGrelha);
 const layerEstrutura = new Konva.Layer(); 
 stage.add(layerEstrutura);
+stage.add(layerGrelha);
 
 
 window.addEventListener('resize',()=>{
