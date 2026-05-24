@@ -1,0 +1,61 @@
+
+/* menu */
+
+
+@media (max-width: 768px) {
+    header.container-fluid {
+        position: fixed;
+        top: 0;
+        left: 40; 
+        z-index: 1050;     
+        transform: translateY(-100%);
+        /* Cria uma animação suave de descida e subida */
+        transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    header.container-fluid::after {
+        content: "Analisador de Estruturas\A \2630";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        width: 42px;
+        height: 62px;
+
+        background: #0077ff;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        font-size: 22px;
+        cursor: pointer;
+        pointer-events: auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        white-space: pre; 
+        text-align: end;
+        align-content: center;
+        min-height: 30px;
+        color: #fff;
+
+        font-size: 30px; 
+        line-height: 1.5;
+        font-weight: 500;
+    }
+        header.container-fluid::after {
+        content: "\2630";
+        position: absolute;
+        padding: 3%;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        height: 50px;
+        background: inherit;
+        align-items: center;
+        justify-content: end;
+        text-align: center;
+    }
+}
+
+
+header.container-fluid:hover {
+    transform: translateY(0);
+}

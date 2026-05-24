@@ -1,7 +1,7 @@
 #container{
-    position: absolute;
-    left:50%;
-    transform: translate(-50%);
+    position: relative;
+    padding: 20px 10%;
+
 }
 
 /* Container que centraliza o menu abaixo do canvas */
@@ -21,10 +21,12 @@
     align-items: center;
     gap: 8px;
     background-color: #ffffff;
+    flex-wrap: wrap;
     padding: 6px 12px;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra suave profissional */
     border: 1px solid #ced4da;
+    justify-content: center;
 }
 
 /* Estilo de cada botão do menu */
@@ -87,30 +89,3 @@
 
 
 
-/* menu */
-
-header.container-fluid {
-    position: fixed;
-    /* top: 1000;
-    left: 40; */
-    /*right: 0*/
-    z-index: 10; /* 1050*/    
-    transform: translateY(-100%);
-    
-    /* Cria uma animação suave de descida e subida */
-    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-}
-
-header.container-fluid::after {
-    content: "";
-    position: absolute;
-    top: 100%;
-    left: 0;
-    width: 100%;
-    height: 25px; 
-    background: transparent; 
-}
-
-header.container-fluid:hover {
-    transform: translateY(0);
-}
