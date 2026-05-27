@@ -59,11 +59,15 @@ window.cancelarDesenhoBarra = function() {
     }
 }
 
-// NOVA FUNÇÃO: Limpa a seleção de qualquer barra ativa
+// NOVA FUNÇÃO: Limpa a seleção de qualquer elemento ativo de forma inteligente
 window.limparSelecao = function() {
     if (window.barraSelecionada) {
-        window.barraSelecionada.stroke('#212529'); // Volta para a cor escura original
-        window.barraSelecionada.strokeWidth(5);
+        // Puxa a cor e espessura originais salvas no objeto (ou usa o padrão da barra se não achar)
+        const cor = window.barraSelecionada.getAttr('corOriginal') || '#212529';
+        const espessura = window.barraSelecionada.getAttr('espOriginal') || 5;
+        
+        window.barraSelecionada.stroke(cor); 
+        window.barraSelecionada.strokeWidth(espessura);
         window.barraSelecionada = null;
     }
     if (tooltipInspecao) {
@@ -263,11 +267,206 @@ function desenharGrelha() {
                         layerGrelha.draw();
                     }
                 }
+                // ... (código existente da Barra) ...
+
+            // --- INSERIR APOIO FIXO ---
+            // --- INSERIR APOIO FIXO ---
+            if (window.ferramentaAtual === 'Apoio Fixo') {
+                const apoio = new Konva.RegularPolygon({
+                    x: this.x(),
+                    y: this.y() + 10, 
+                    sides: 3,         
+                    radius: 12,
+                    fill: '#198754',  
+                    stroke: '#212529',
+                    strokeWidth: 2,
+                    listening: true   // Importante para ouvir o clique!
+                });
+
+                // LÓGICA DE SELEÇÃO DO APOIO
+                // LÓGICA DE SELEÇÃO DO APOIO (Agora com Tooltip!)
+                apoio.on('click tap', function(e) {
+                    if (window.ferramentaAtual === 'Selecionar') {
+                        e.cancelBubble = true; 
+                        window.limparSelecao();
+                        
+                        this.setAttr('corOriginal', this.stroke());
+                        this.setAttr('espOriginal', this.strokeWidth());
+                        
+                        window.barraSelecionada = this; 
+                        this.stroke('#ffc107'); 
+                        this.strokeWidth(4);
+
+                        // --- CRIANDO O TOOLTIP DO APOIO ---
+                        // Colocamos o balão um pouco acima do apoio (y - 40)
+                        tooltipInspecao = new Konva.Group({
+                            x: this.x(), 
+                            y: this.y() - 40, 
+                        });
+
+                        const fundoTooltip = new Konva.Rect({
+                            x: -40, y: -20, width: 80, height: 40,
+                            fill: '#343a40d4', cornerRadius: 6,
+                            shadowColor: 'black', shadowBlur: 4, shadowOpacity: 0.3, shadowOffset: { x: 0, y: 2 }
+                        });
+
+                        const ponta = new Konva.Line({
+                            points: [-6, 20, 6, 20, 0, 28], 
+                            fill: '#343a40', closed: true
+                        });
+
+                        const botaoApagarGrupo = new Konva.Group({
+                            x: -35, y: -10, listening: true
+                        });
+
+                        const fundoBotao = new Konva.Rect({
+                            width: 70, height: 20, fill: '#dc3545', cornerRadius: 3
+                        });
+
+                        const textoBotao = new Konva.Text({
+                            text: 'Apagar', width: 70, height: 20,
+                            fontFamily: 'Arial', fontSize: 12, fontStyle: 'bold',
+                            fill: 'white', align: 'center', verticalAlign: 'middle'
+                        });
+
+                        botaoApagarGrupo.add(fundoBotao, textoBotao);
+                        
+                        // O mesmo botão apaga qualquer coisa que esteja em window.barraSelecionada
+                        botaoApagarGrupo.on('click tap', function(e) {
+                            e.cancelBubble = true; 
+                            apagarBarra(); 
+                        });
+
+                        botaoApagarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
+                        botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
+
+                        tooltipInspecao.add(fundoTooltip, ponta, botaoApagarGrupo);
+                        layerEstrutura.add(tooltipInspecao);
+                        tooltipInspecao.moveToTop();
+                        // -----------------------------------
+
+                        layerEstrutura.draw();
+                    }
+                });
+                apoio.on('mouseenter', function() { if (window.ferramentaAtual === 'Selecionar') document.body.style.cursor = 'pointer'; });
+                apoio.on('mouseleave', function() { document.body.style.cursor = 'default'; });
+
+                layerEstrutura.add(apoio);
+                layerEstrutura.draw();
+                
+                this.fill('#198754');
+                setTimeout(() => { this.fill('#a0a0a0'); layerGrelha.draw(); }, 200);
+            }
+
+            // --- INSERIR CARGA CONCENTRADA ---
+            if (window.ferramentaAtual === 'Carga') {
+                const carga = new Konva.Arrow({
+                    points: [this.x(), this.y() - 40, this.x(), this.y() - 5], 
+                    pointerLength: 8,
+                    pointerWidth: 8,
+                    fill: '#dc3545',   
+                    stroke: '#dc3545',
+                    strokeWidth: 3,
+                    listening: true
+                });
+
+                // LÓGICA DE SELEÇÃO DA CARGA
+                // LÓGICA DE SELEÇÃO DA CARGA (Agora com Tooltip padronizado!)
+                carga.on('click tap', function(e) {
+                    if (window.ferramentaAtual === 'Selecionar') {
+                        e.cancelBubble = true; 
+                        window.limparSelecao();
+                        
+                        this.setAttr('corOriginal', this.stroke());
+                        this.setAttr('espOriginal', this.strokeWidth());
+                        
+                        window.barraSelecionada = this; 
+                        this.stroke('#ffc107'); 
+                        this.strokeWidth(5);
+
+                        // --- CRIANDO O TOOLTIP DA CARGA ---
+                        // A seta já sobe 40px, então colocamos o balão acima dela (y da ponta de cima - 20)
+                        const pts = this.points(); // Pega as coordenadas [x1, y1, x2, y2]
+                        tooltipInspecao = new Konva.Group({
+                            x: pts[0], 
+                            y: pts[1] - 20, 
+                        });
+
+                        const fundoTooltip = new Konva.Rect({
+                            x: -40, y: -20, width: 80, height: 40,
+                            fill: '#343a40d4', cornerRadius: 6,
+                            shadowColor: 'black', shadowBlur: 4, shadowOpacity: 0.3, shadowOffset: { x: 0, y: 2 }
+                        });
+
+                        const ponta = new Konva.Line({
+                            points: [-6, 20, 6, 20, 0, 28], 
+                            fill: '#343a40', closed: true
+                        });
+
+                        const botaoApagarGrupo = new Konva.Group({
+                            x: -35, y: -10, listening: true
+                        });
+
+                        const fundoBotao = new Konva.Rect({
+                            width: 70, height: 20, fill: '#dc3545', cornerRadius: 3
+                        });
+
+                        const textoBotao = new Konva.Text({
+                            text: 'Apagar', width: 70, height: 20,
+                            fontFamily: 'Arial', fontSize: 12, fontStyle: 'bold',
+                            fill: 'white', align: 'center', verticalAlign: 'middle'
+                        });
+
+                        botaoApagarGrupo.add(fundoBotao, textoBotao);
+                        
+                        botaoApagarGrupo.on('click tap', function(e) {
+                            e.cancelBubble = true; 
+                            apagarBarra(); 
+                        });
+
+                        botaoApagarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
+                        botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
+
+                        tooltipInspecao.add(fundoTooltip, ponta, botaoApagarGrupo);
+                        layerEstrutura.add(tooltipInspecao);
+                        tooltipInspecao.moveToTop();
+                        // -----------------------------------
+
+                        layerEstrutura.draw();
+                    }
+                });
+                carga.on('mouseenter', function() { if (window.ferramentaAtual === 'Selecionar') document.body.style.cursor = 'pointer'; });
+                carga.on('mouseleave', function() { document.body.style.cursor = 'default'; });
+
+                layerEstrutura.add(carga);
+                layerEstrutura.draw();
+
+                this.fill('#dc3545');
+                setTimeout(() => { this.fill('#a0a0a0'); layerGrelha.draw(); }, 200);
+            }
+            
+            // --- INSERIR NÓ (Mantém como estava) ---
+            if (window.ferramentaAtual === 'Inserir Nó') {
+                const noEstrutural = new Konva.Circle({
+                    x: this.x(),
+                    y: this.y(),
+                    radius: 4,
+                    fill: '#212529',
+                    listening: true
+                });
+                
+                // Nós geralmente não precisam ser selecionados para apagar individualmente,
+                // já que servem apenas de marcação visual, mas você pode replicar a lógica acima se quiser.
+
+                layerEstrutura.add(noEstrutural);
+                layerEstrutura.draw();
+            }
             });
 
             layerGrelha.add(ponto);
         }
     }
+
 
 
     //Sistemas de Coordenadas//
