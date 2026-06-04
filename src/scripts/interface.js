@@ -25,7 +25,7 @@ window.addEventListener('scroll', () => {
     const posicaoScrollAtual = window.scrollY;
 
     // Se o utilizador fez scroll para baixo e já passou de 40px do topo: OCULTA
-    if (posicaoScrollAtual > 10) {
+    if (posicaoScrollAtual > 5) {
         header.classList.add('header-oculto');
     } 
     // Se o utilizador fez scroll para cima: MOSTRA
