@@ -8,23 +8,16 @@
     <link rel="stylesheet" href="styles/calculadora.css">
     <link rel="stylesheet" href="styles/header.css">
 
-<!--  //Bibliotecas// -->
-
-    <script src="https://cdn.jsdelivr.net/npm/konva@9.3.6/konva.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/konva@9.3.6/konva.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header class="container-fluid text-bg-primary">
         <div class="text-center p-5">
             <h1 >Calculadora </h1>
-
         </div>
         
-      
-
         <nav class="navbar p-0 navbar-dark navbar-expand-sm bg-primary justify-content-center justify-content-sm-end">
                 <ul class="navbar-nav ">
-                
                     <li class="nav-item text-center" >
                         <a href="index.html" class=" nav-link" >Home</a>
                     </li>
@@ -42,18 +35,9 @@
     </header>
 
     <main class="text-center mt-5 flex-fill">
-        <p>
-        em produção... &awconint;    
-        </p>
-    
+        <p>em produção... &awconint;</p>
         <div id="container"></div>
-        
-
     </main>
-
-
-
-<!-- Aqui está o menu interativo com que o usuário pode acessar suas ferramentas -->
 
 <div class="toolbar-container">
     <div class="structural-toolbar">
@@ -94,6 +78,15 @@
             <span>Apoio Fixo</span>
         </button>
 
+        <button class="toolbar-btn" title="Adicionar Apoio Simples">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 9l-6 9h12l-6-9z"/>
+                <circle cx="12" cy="9" r="1.5" fill="white" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M4 20h16"/>
+            </svg>
+            <span>Apoio Simples</span>
+        </button>
+
         <button class="toolbar-btn" title="Adicionar Carga Concentrada">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <line x1="12" y1="3" x2="12" y2="17" stroke-width="3"/>
@@ -115,11 +108,6 @@
     </div>
 </div>
 
-<!-- Aqui é o fim do menu -->
-
-
-
-
     <footer class=" mt-5 container-fluid p-4 bg-dark text-white text-center">
     <div class="row">
         <p class="col">Column 01</p>
@@ -127,7 +115,6 @@
     </div>
     </footer>
 
-    <!-- MODAL -->
 <div class="modal fade" id="eraseGridModal" tabindex="-1" role="dialog" aria-labelledby="eraseGridModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -149,9 +136,6 @@
     <script src="scripts/menu_ferramentas.js"></script>
     <script src="scripts/grelha.js"> </script>    
 
-
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
-
-
 </body>
 </html>

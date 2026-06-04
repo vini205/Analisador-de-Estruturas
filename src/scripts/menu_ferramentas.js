@@ -21,7 +21,6 @@ botoesMenu.forEach(botao => {
             window.cancelarDesenhoBarra();
         }
 
-        
         console.log("🛠️ Ferramenta ativa:", window.ferramentaAtual);
     });
 });
