@@ -2,7 +2,7 @@
 
 // 1. Pegamos o tamanho da tela
 const width = (window.innerWidth) * 0.8;
-const height = (window.innerHeight) * 0.5;
+const height = (window.innerHeight) * 0.85;
 let tamanhoGrelha = calcularTamanhoGrelha(window.innerWidth);
 
 function calcularTamanhoGrelha(width) {
@@ -38,7 +38,7 @@ window.addEventListener('resize', () => {
     
     // Atualiza o tamanho do Canvas
     stage.width(window.innerWidth * 0.8);
-    stage.height(window.innerHeight * 0.5);
+    stage.height(window.innerHeight * 0.85);
     
     // Calcula o novo tamanho da grelha
     tamanhoGrelha = calcularTamanhoGrelha(window.innerWidth);

@@ -4,6 +4,32 @@
 
 }
 
+header.container-fluid {
+    position: sticky;
+    top: 0;
+    z-index: 1050;
+    
+    /* Define o limite máximo de altura atual do menu e a transição */
+    max-height: 200px; 
+    margin-bottom: 0;
+    overflow: hidden; /* Garante que o texto suma ao encolher */
+    transition: max-height 0.4s ease-in-out, margin-top 0.4s ease-in-out, visibility 0.4s;
+}
+
+/* Quando ocultado, o elemento colapsa a sua geometria a zero.
+   O Bootstrap Flexbox vai detetar que ele mede 0px e subirá o <main> imediatamente! */
+.header-oculto {
+    max-height: 0px !important;
+    margin-top: -20px; /* Compensa pequenas arestas do Bootstrap */
+    visibility: hidden;
+}
+
+/* Garante que o main transite suavemente junto com o cabeçalho */
+main {
+    transition: all 0.4s ease-in-out;
+}
+
+
 /* Container que centraliza o menu abaixo do canvas */
 .toolbar-container {
     width: 100%;
