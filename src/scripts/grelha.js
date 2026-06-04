@@ -24,15 +24,61 @@ const layerEstrutura = new Konva.Layer();
 stage.add(layerEstrutura);
 stage.add(layerGrelha);
 
-window.addEventListener('resize',()=>{
+
+// --- REDIMENSIONAMENTO INTELIGENTE DA TELA ---
+window.addEventListener('resize', () => {
+    // 1. Por segurança, cancelamos qualquer barra/carga que o usuário 
+    // estava desenhando pela metade no momento em que a tela mudou de tamanho
+    if (typeof window.cancelarDesenhoBarra === 'function') {
+        window.cancelarDesenhoBarra();
+    }
+
+    // 2. Guardamos o tamanho antigo antes de calcular o novo
+    const tamanhoGrelhaAntigo = tamanhoGrelha;
+    
+    // Atualiza o tamanho do Canvas
     stage.width(window.innerWidth * 0.8);
     stage.height(window.innerHeight * 0.5);
     
+    // Calcula o novo tamanho da grelha
     tamanhoGrelha = calcularTamanhoGrelha(window.innerWidth);
+    
+    // 3. Descobrimos a taxa de proporção (ex: 40 / 50 = 0.8)
+    const proporcao = tamanhoGrelha / tamanhoGrelhaAntigo;
+
+    // Redesenha a grelha no fundo
     desenharGrelha();
     
+    // 4. Se o tamanho da grelha realmente sofreu alteração, 
+    // ajustamos as coordenadas de toda a estrutura para que acompanhem os novos pontos
+    if (proporcao !== 1) {
+        recalcularPosicoesEstrutura(proporcao);
+    }
+    
     layerEstrutura.draw();
-})
+});
+
+// NOVA FUNÇÃO: Varre a camada da estrutura recalculando as posições
+function recalcularPosicoesEstrutura(proporcao) {
+    // getChildren() pega todas as Barras, Cargas, Apoios e Nós desenhados
+    layerEstrutura.getChildren().forEach(elemento => {
+        
+        // Atualiza as coordenadas base (X e Y) usadas pelos Nós, Grupos e Apoios Fixos
+        elemento.x(elemento.x() * proporcao);
+        elemento.y(elemento.y() * proporcao);
+
+        // Se o elemento for uma Linha (Barra) ou Seta (Carga),
+        // precisamos atualizar o Array de coordenadas internamente
+        if (elemento.className === 'Line' || elemento.className === 'Arrow') {
+            const pontosAntigos = elemento.points();
+            // Multiplica cada ponto x, y do array pela proporção
+            const novosPontos = pontosAntigos.map(p => p * proporcao);
+            elemento.points(novosPontos);
+        }
+    });
+    
+    console.log(`📏 Estrutura ajustada à nova escala (Proporção: ${proporcao})`);
+}
 
 desenharGrelha();
 
