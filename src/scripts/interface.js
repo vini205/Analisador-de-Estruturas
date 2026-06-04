@@ -1,46 +1,46 @@
 const header = document.querySelector('header');
 const containerGrelha = document.getElementById('container');
 
-// Variável para guardar a última posição do scroll
-let ultimaPosicaoScroll = window.scrollY;
-
-// --- 1. COMPORTAMENTO POR MOVIMENTO DO RATO (DESKTOP) ---
-
-// Esconde o menu quando o rato entra na área de desenho da grelha
-containerGrelha.addEventListener('mouseenter', () => {
-    header.classList.add('header-oculto');
-});
-
-// Mostra o menu quando o rato se aproxima do topo do ecrã (menos de 60px)
-document.addEventListener('mousemove', (e) => {
-    if (e.clientY < 60) {
-        header.classList.remove('header-oculto');
-    }
-});
-
-
-// --- 2. COMPORTAMENTO POR ROLAGEM / SCROLL (DESKTOP E TELEMÓVEL) ---
-
-window.addEventListener('scroll', () => {
-    const posicaoScrollAtual = window.scrollY;
-
-    // Se o utilizador fez scroll para baixo e já passou de 40px do topo: OCULTA
-    if (posicaoScrollAtual > 5) {
-        header.classList.add('header-oculto');
-    } 
-    // Se o utilizador fez scroll para cima: MOSTRA
-    else if (posicaoScrollAtual < 10) {
-        header.classList.remove('header-oculto');
-    }
+// --- 1. COMPORTAMENTO EXCLUSIVO PARA DESKTOP (MOUSE) ---
+// Só ativa se o dispositivo NÃO for puramente móvel/touch
+if (window.matchMedia("(pointer: fine)").matches) {
     
-    // Atualiza a posição para a próxima comparação
-    ultimaPosicaoScroll = posicaoScrollAtual;
-});
+    // Esconde o menu quando o mouse entra na área de desenho da grelha
+    containerGrelha.addEventListener('mouseenter', () => {
+        header.classList.add('header-oculto');
+    });
 
+    // Mostra o menu quando o mouse se aproxima do topo da tela (menos de 60px)
+    document.addEventListener('mousemove', (e) => {
+        if (e.clientY < 60) {
+            header.classList.remove('header-oculto');
+        }
+    });
+}
 
-// --- 3. COMPORTAMENTO POR TOQUE (TELEMÓVEL) ---
+// --- 2. COMPORTAMENTO EXCLUSIVO PARA CELULARES/TABLETS (TOUCH & SCROLL) ---
+// Só ativa se o dispositivo principal for toque (móvel)
+if (window.matchMedia("(pointer: coarse)").matches) {
+    let ultimaPosicaoScroll = window.scrollY;
 
-// Se o utilizador tocar na grelha para desenhar ou interagir, o menu recolhe logo
-containerGrelha.addEventListener('touchstart', () => {
-    header.classList.add('header-oculto');
-}, { passive: true });
+    // Controla o menu através do movimento de arrastar a página
+    window.addEventListener('scroll', () => {
+        const posicaoScrollAtual = window.scrollY;
+
+        // Se o usuário arrastou para baixo: OCULTA
+        if (posicaoScrollAtual > 5) {
+            header.classList.add('header-oculto');
+        } 
+        // Se o usuário arrastou para cima: MOSTRA
+        else if (posicaoScrollAtual < 10) {
+            header.classList.remove('header-oculto');
+        }
+        
+        ultimaPosicaoScroll = posicaoScrollAtual;
+    });
+
+    // Se o usuário tocar na área da grelha para interagir, recolhe o menu imediatamente
+    containerGrelha.addEventListener('touchstart', () => {
+        header.classList.add('header-oculto');
+    }, { passive: true });
+}
