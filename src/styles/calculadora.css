@@ -8,24 +8,40 @@ header.container-fluid {
     position: fixed;
     top: 0;
     z-index: 1050;
-    
-    /* Define o limite máximo de altura atual do menu e a transição */
-    max-height: 200px; 
+    /* max-height: 200px; */
     margin-bottom: 0;
     overflow: hidden; /* Garante que o texto suma ao encolher */
     transition: max-height 0.4s ease-in-out, margin-top 0.4s ease-in-out, visibility 0.4s;
 }
 
-/* Quando ocultado, o elemento colapsa a sua geometria a zero.
-   O Bootstrap Flexbox vai detetar que ele mede 0px e subirá o <main> imediatamente! */
+@media (max-width: 768px) {
+    header.container-fluid{
+        min-height: 7%;
+
+    }
+        header.container-fluid div:nth-child(2) {
+        position: relative;
+        padding: 0 !important;
+        margin-top: 20px;
+        width: 86%;
+    }
+    header.container-fluid h1{
+        font-size: 15px;
+        top:5%;
+
+    }
+
+}
+
+
 .header-oculto {
     max-height: 0px !important;
     margin-top: -20px; /* Compensa pequenas arestas do Bootstrap */
     visibility: hidden;
 }
 
-/* Garante que o main transite suavemente junto com o cabeçalho */
-main {
+main#main:nth-child(2) {
+    margin-top: 110px !important; 
     transition: all 0.4s ease-in-out;
 }
 

@@ -44,9 +44,11 @@ if (header && containerGrelha) {
         }, { passive: true }); // A flag passive melhora o framerate da rolagem
 
         containerGrelha.addEventListener('touchstart', () => {
-            if (!header.classList.contains('header-oculto')) {
+            console.log("aqui")
+            if (!header.classList.contains('header-oculto') && window.scrollY > 50 ) {
                 header.classList.add('header-oculto');
             }
         }, { passive: true });
     }
-}
+        
+} 
