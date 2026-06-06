@@ -1,6 +1,6 @@
 //Grelha!!!;
 
-// 1. Pegamos o tamanho da tela
+
 const width = (window.innerWidth) * 0.8;
 const height = (window.innerHeight) * 0.85;
 let tamanhoGrelha = calcularTamanhoGrelha(window.innerWidth);
@@ -27,30 +27,21 @@ stage.add(layerGrelha);
 
 // --- REDIMENSIONAMENTO INTELIGENTE DA TELA ---
 window.addEventListener('resize', () => {
-    // 1. Por segurança, cancelamos qualquer barra/carga que o usuário 
-    // estava desenhando pela metade no momento em que a tela mudou de tamanho
-    if (typeof window.cancelarDesenhoBarra === 'function') {
-        window.cancelarDesenhoBarra();
-    }
-
-    // 2. Guardamos o tamanho antigo antes de calcular o novo
+   // cancelar acao
+   cancelarDesenhoBarra();
+        
     const tamanhoGrelhaAntigo = tamanhoGrelha;
     
     // Atualiza o tamanho do Canvas
     stage.width(window.innerWidth * 0.8);
     stage.height(window.innerHeight * 0.85);
     
-    // Calcula o novo tamanho da grelha
     tamanhoGrelha = calcularTamanhoGrelha(window.innerWidth);
     
-    // 3. Descobrimos a taxa de proporção (ex: 40 / 50 = 0.8)
     const proporcao = tamanhoGrelha / tamanhoGrelhaAntigo;
 
-    // Redesenha a grelha no fundo
     desenharGrelha();
     
-    // 4. Se o tamanho da grelha realmente sofreu alteração, 
-    // ajustamos as coordenadas de toda a estrutura para que acompanhem os novos pontos
     if (proporcao !== 1) {
         recalcularPosicoesEstrutura(proporcao);
     }
@@ -58,7 +49,7 @@ window.addEventListener('resize', () => {
     layerEstrutura.draw();
 });
 
-// NOVA FUNÇÃO: Varre a camada da estrutura recalculando as posições
+// recalculando as posições
 function recalcularPosicoesEstrutura(proporcao) {
     // getChildren() pega todas as Barras, Cargas, Apoios e Nós desenhados
     layerEstrutura.getChildren().forEach(elemento => {
@@ -67,29 +58,25 @@ function recalcularPosicoesEstrutura(proporcao) {
         elemento.x(elemento.x() * proporcao);
         elemento.y(elemento.y() * proporcao);
 
-        // Se o elemento for uma Linha (Barra) ou Seta (Carga),
         // precisamos atualizar o Array de coordenadas internamente
         if (elemento.className === 'Line' || elemento.className === 'Arrow') {
             const pontosAntigos = elemento.points();
-            // Multiplica cada ponto x, y do array pela proporção
             const novosPontos = pontosAntigos.map(p => p * proporcao);
             elemento.points(novosPontos);
         }
-    });
-    
+    });    
     console.log(`📏 Estrutura ajustada à nova escala (Proporção: ${proporcao})`);
 }
 
 desenharGrelha();
 
-// --- 3. LÓGICA DE DESENHO E GRELHA ---
 let pontoInicialBarra = null;
-let pontoInicialCarga = null; // Variável para controlar o primeiro clique da carga
-window.barraSelecionada = null;
+let pontoInicialCarga = null; 
+let barraSelecionada = null;
 let tooltipInspecao = null;
 
 // Função para cancelar o desenho da barra ou da carga
-window.cancelarDesenhoBarra = function() {
+function cancelarDesenhoBarra() {
     if (pontoInicialBarra) {
         pontoInicialBarra.referencia.fill('#a0a0a0'); 
         pontoInicialBarra.referencia.radius(2);       
@@ -101,26 +88,24 @@ window.cancelarDesenhoBarra = function() {
         pontoInicialCarga = null;
     }
     layerGrelha.draw();
-    console.log("Desenho cancelado por mudança de ferramenta.");
 }
 
 
-// Função para limpar seleções ativas
-window.limparSelecao = function() {
-    if (window.barraSelecionada) {
+function limparSelecao() {
+    if (barraSelecionada) {
         // Se for um Nó (Circle) e não um apoio/barra
-        if (window.barraSelecionada.className === 'Circle' && !window.barraSelecionada.name()) {
-            const cor = window.barraSelecionada.getAttr('corOriginal') || '#212529';
-            window.barraSelecionada.fill(cor);
+        if (barraSelecionada.className === 'Circle' && !barraSelecionada.name()) {
+            const cor = barraSelecionada.getAttr('corOriginal') || '#212529';
+            barraSelecionada.fill(cor);
         } else {
             // Barras, Cargas e Apoios usam Stroke
-            const cor = window.barraSelecionada.getAttr('corOriginal') || '#212529';
-            const espessura = window.barraSelecionada.getAttr('espOriginal') || 5;
+            const cor = barraSelecionada.getAttr('corOriginal') || '#212529';
+            const espessura = barraSelecionada.getAttr('espOriginal') || 5;
             
-            window.barraSelecionada.stroke(cor); 
-            window.barraSelecionada.strokeWidth(espessura);
+            barraSelecionada.stroke(cor); 
+            barraSelecionada.strokeWidth(espessura);
         }
-        window.barraSelecionada = null;
+        barraSelecionada = null;
     }
     if (tooltipInspecao) {
         tooltipInspecao.destroy(); 
@@ -162,7 +147,7 @@ function desenharGrelha() {
             // EVENTO DE CLIQUE NO PONTO DA GRELHA
             ponto.on('click tap', function () {
                 if (window.ferramentaAtual === 'Selecionar') {
-                    window.limparSelecao();
+                    limparSelecao();
                     
                     // TRUQUE: Desativa temporariamente o sensor da grelha para ver o que está atrás
                     layerGrelha.listening(false);
@@ -187,7 +172,7 @@ function desenharGrelha() {
                         layerGrelha.draw();
                     } else {
                         if (this.x() === pontoInicialBarra.x && this.y() === pontoInicialBarra.y) {
-                            window.cancelarDesenhoBarra();
+                            cancelarDesenhoBarra();
                             return;
                         }
 
@@ -204,9 +189,9 @@ function desenharGrelha() {
                         barra.on('click tap', function(e) {
                             if (window.ferramentaAtual === 'Selecionar') {
                                 e.cancelBubble = true; 
-                                window.limparSelecao();
+                                limparSelecao();
 
-                                window.barraSelecionada = this;
+                                barraSelecionada = this;
                                 this.stroke('#dc3545'); 
                                 
                                 const pts = this.points();
@@ -269,10 +254,11 @@ function desenharGrelha() {
 
                     apoio.on('click tap', function(e) {
                         if (window.ferramentaAtual === 'Selecionar') {
-                            e.cancelBubble = true; window.limparSelecao();
+                            e.cancelBubble = true; 
+                            limparSelecao();
                             this.setAttr('corOriginal', this.stroke());
                             this.setAttr('espOriginal', this.strokeWidth());
-                            window.barraSelecionada = this; 
+                            barraSelecionada = this; 
                             this.stroke('#ffc107'); this.strokeWidth(4);
 
                             tooltipInspecao = new Konva.Group({ x: this.x(), y: this.y() - 40 });
@@ -325,12 +311,13 @@ function desenharGrelha() {
 
                     apoioSimplesGrupo.on('click tap', function(e) {
                         if (window.ferramentaAtual === 'Selecionar') {
-                            e.cancelBubble = true; window.limparSelecao();
+                            e.cancelBubble = true; 
+                            limparSelecao();
                             
                             triangulo.setAttr('corOriginal', triangulo.stroke());
                             triangulo.setAttr('espOriginal', triangulo.strokeWidth());
                             
-                            window.barraSelecionada = triangulo; 
+                            barraSelecionada = triangulo; 
                             triangulo.stroke('#ffc107'); 
                             triangulo.strokeWidth(4);
 
@@ -374,7 +361,7 @@ function desenharGrelha() {
                     } else {
                         // Se o segundo clique for no mesmo ponto, cancela
                         if (this.x() === pontoInicialCarga.x && this.y() === pontoInicialCarga.y) {
-                            window.cancelarDesenhoBarra();
+                            cancelarDesenhoBarra();
                             return;
                         }
 
@@ -392,10 +379,11 @@ function desenharGrelha() {
 
                         carga.on('click tap', function(e) {
                             if (window.ferramentaAtual === 'Selecionar') {
-                                e.cancelBubble = true; window.limparSelecao();
+                                e.cancelBubble = true; 
+                                limparSelecao();
                                 this.setAttr('corOriginal', this.stroke());
                                 this.setAttr('espOriginal', this.strokeWidth());
-                                window.barraSelecionada = this; 
+                                barraSelecionada = this; 
                                 this.stroke('#ffc107'); this.strokeWidth(5);
 
                                 // Calcula o ponto médio da seta para posicionar o balão de forma limpa
@@ -445,11 +433,11 @@ function desenharGrelha() {
                     noEstrutural.on('click tap', function(e) {
                         if (window.ferramentaAtual === 'Selecionar') {
                             e.cancelBubble = true; 
-                            window.limparSelecao();
+                            limparSelecao();
 
                             // Guarda a cor original preta antes de amarelar
                             this.setAttr('corOriginal', this.fill());
-                            window.barraSelecionada = this;
+                            barraSelecionada = this;
                             this.fill('#ffc107'); // Fica amarelo ao selecionar
                             
                             // Cria o menu flutuante de Apagar logo acima do Nó
@@ -513,14 +501,14 @@ document.addEventListener('keydown', function(event) {
 });
 
 function apagarBarra() {
-    if (window.barraSelecionada) {
-            if (window.barraSelecionada.name() === 'trianguloApoioSimples' && window.barraSelecionada.getParent()) {
-                window.barraSelecionada.getParent().destroy();
+    if (barraSelecionada) {
+            if (barraSelecionada.name() === 'trianguloApoioSimples' && barraSelecionada.getParent()) {
+                barraSelecionada.getParent().destroy();
             } else {
-                window.barraSelecionada.destroy(); 
+                barraSelecionada.destroy(); 
             }
             
-            window.barraSelecionada = null;
+            barraSelecionada = null;
             if (tooltipInspecao) {
                 tooltipInspecao.destroy();
                 tooltipInspecao = null;
@@ -531,8 +519,8 @@ function apagarBarra() {
 }
 
 window.apagarTodaEstrutura = function() {
-    window.cancelarDesenhoBarra();
-    window.limparSelecao();
+    cancelarDesenhoBarra();
+    limparSelecao();
     layerEstrutura.destroyChildren();
     layerEstrutura.draw();
     console.log("🧹 Toda a estrutura foi apagada da tela!");
@@ -542,17 +530,15 @@ window.apagarTodaEstrutura = function() {
 document.addEventListener('click', function(e) {
     const container = document.getElementById('container');
     if (!container.contains(e.target)) {
-        if (typeof window.limparSelecao === 'function') {
-            window.limparSelecao();
-        }
+        limparSelecao();
     }
 });
 
 stage.on('click tap', function (e) {
     if (e.target === stage) {
-        window.limparSelecao();
+        limparSelecao();
         if (window.ferramentaAtual === 'Inserir Barra' || window.ferramentaAtual === 'Carga') {
-            window.cancelarDesenhoBarra();
+            cancelarDesenhoBarra();
         }
     }
 });
