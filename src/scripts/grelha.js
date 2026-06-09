@@ -339,11 +339,12 @@ function desenharGrelha() {
                         x: 0, y: 10, sides: 3, radius: 12,
                         fill: '#198754', stroke: '#212529', strokeWidth: 2,
                         name: 'trianguloApoioSimples', 
-                        listening: true
+                        listening: true,
+                        id: apoioSimplesData.id
                     });
 
                     const circulinhoBranco = new Konva.Circle({
-                        x: 0, y: 0, radius: 4, fill: 'white', stroke: '#212529', strokeWidth: 1.5, listening: false 
+                        x: 0, y: 0, radius: 4, fill: 'white', stroke: '#212529', strokeWidth: 1.5, listening: false, id: apoioSimplesData.id 
                     });
 
                     apoioSimplesGrupo.add(triangulo, circulinhoBranco);
@@ -478,17 +479,20 @@ function desenharGrelha() {
                 
                 // --- INSERIR NÓ ---
                 if (window.ferramentaAtual === 'Inserir Nó') {
-                    const noEstrutural = new Konva.Circle({ 
-                        x: this.x(), y: this.y(), radius: 5, fill: '#212529', listening: true 
-                    });
                     const noData ={
-                        tipo: 'apoioSimples',
+                        tipo: 'nos',
                         id: Date.now(),
                         x: (this.x() - tamanhoGrelha) / tamanhoGrelha,
                         y: (this.y() - tamanhoGrelha) / tamanhoGrelha
                     }; 
                     sistemaEstatico.nos.push(noData);
                     hearMeOut();
+
+                    const noEstrutural = new Konva.Circle({ 
+                        x: this.x(), y: this.y(), radius: 5, fill: '#212529', listening: true, id: noData.id 
+                    });
+                    
+                    
 
                     noEstrutural.on('click tap', function(e) {
                         if (window.ferramentaAtual === 'Selecionar') {
