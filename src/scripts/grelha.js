@@ -1,5 +1,11 @@
 //Grelha!!!;
-
+const sistemaEstatico = {
+    barras: [],
+    apoiosFixos: [],
+    apoiosSimples: [],
+    nos: [],
+    cargas: []
+};
 
 const width = (window.innerWidth) * 0.8;
 const height = (window.innerHeight) * 0.85;
@@ -175,6 +181,17 @@ function desenharGrelha() {
                             cancelarDesenhoBarra();
                             return;
                         }
+                        //Colocando os atributos da barra aqui
+                        const barraData = {
+                            tipo: 'barra',
+                            id: Date.now(),
+                            x1: (pontoInicialBarra.x - tamanhoGrelha) / tamanhoGrelha,
+                            y1: (pontoInicialBarra.y - tamanhoGrelha) / tamanhoGrelha,
+                            x2: (this.x() - tamanhoGrelha) / tamanhoGrelha,
+                            y2: (this.y() - tamanhoGrelha) / tamanhoGrelha
+                        };
+                        sistemaEstatico.barras.push(barraData);
+                        hearMeOut();
 
                         const barra = new Konva.Line({
                             points: [pontoInicialBarra.x, pontoInicialBarra.y, this.x(), this.y()],
@@ -183,8 +200,10 @@ function desenharGrelha() {
                             hitStrokeWidth: 15,
                             lineCap: 'round',
                             lineJoin: 'round',
-                            listening: true
+                            listening: true,
+                            id: barraData.id
                         });
+
 
                         barra.on('click tap', function(e) {
                             if (window.ferramentaAtual === 'Selecionar') {
@@ -247,10 +266,21 @@ function desenharGrelha() {
 
                 // --- INSERIR APOIO FIXO ---
                 if (window.ferramentaAtual === 'Apoio Fixo') {
+                    const apoioFixoData ={
+                        tipo: 'apoioFixo',
+                        id: Date.now(),
+                        x: (this.x() - tamanhoGrelha) / tamanhoGrelha,
+                        y: (this.y() - tamanhoGrelha) / tamanhoGrelha
+                    }; 
+                    sistemaEstatico.apoiosFixos.push(apoioFixoData);
+                    hearMeOut();
+
                     const apoio = new Konva.RegularPolygon({
                         x: this.x(), y: this.y() + 10, sides: 3, radius: 12,
-                        fill: '#198754', stroke: '#212529', strokeWidth: 2, listening: true
+                        fill: '#198754', stroke: '#212529', strokeWidth: 2, listening: true,
+                        id: apoioFixoData.id
                     });
+                
 
                     apoio.on('click tap', function(e) {
                         if (window.ferramentaAtual === 'Selecionar') {
@@ -273,9 +303,9 @@ function desenharGrelha() {
                             botaoApagarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
                             botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
 
+                            tooltipInspecao.moveToTop();
                             tooltipInspecao.add(fundoTooltip, ponta, botaoApagarGrupo);
                             layerEstrutura.add(tooltipInspecao);
-                            tooltipInspecao.moveToTop();
                             layerEstrutura.draw();
                         }
                     });
@@ -294,17 +324,27 @@ function desenharGrelha() {
                     const xAlvo = this.x();
                     const yAlvo = this.y();
 
-                    const apoioSimplesGrupo = new Konva.Group({ x: xAlvo, y: yAlvo, listening: true });
+                    const apoioSimplesData ={
+                        tipo: 'apoioSimples',
+                        id: Date.now(),
+                        x: (xAlvo - tamanhoGrelha) / tamanhoGrelha,
+                        y: (yAlvo - tamanhoGrelha) / tamanhoGrelha
+                    }; 
+                    sistemaEstatico.apoiosSimples.push(apoioSimplesData);
+                    hearMeOut();
+
+                    const apoioSimplesGrupo = new Konva.Group({ x: xAlvo, y: yAlvo, listening: true, id: apoioSimplesData.id});
 
                     const triangulo = new Konva.RegularPolygon({
                         x: 0, y: 10, sides: 3, radius: 12,
                         fill: '#198754', stroke: '#212529', strokeWidth: 2,
                         name: 'trianguloApoioSimples', 
-                        listening: true
+                        listening: true,
+                        id: apoioSimplesData.id
                     });
 
                     const circulinhoBranco = new Konva.Circle({
-                        x: 0, y: 0, radius: 4, fill: 'white', stroke: '#212529', strokeWidth: 1.5, listening: false 
+                        x: 0, y: 0, radius: 4, fill: 'white', stroke: '#212529', strokeWidth: 1.5, listening: false, id: apoioSimplesData.id 
                     });
 
                     apoioSimplesGrupo.add(triangulo, circulinhoBranco);
@@ -339,8 +379,8 @@ function desenharGrelha() {
                             layerEstrutura.draw();
                         }
                     });
-
                     apoioSimplesGrupo.on('mouseenter', function() { if (window.ferramentaAtual === 'Selecionar') document.body.style.cursor = 'pointer'; });
+
                     apoioSimplesGrupo.on('mouseleave', function() { document.body.style.cursor = 'default'; });
 
                     layerEstrutura.add(apoioSimplesGrupo);
@@ -367,6 +407,17 @@ function desenharGrelha() {
 
                         // Segundo clique define o FINAL (Cauda).
                         // Passamos o ponto atual (cauda) primeiro e o ponto inicial (ponta) por último
+                        const cargaData = {
+                            tipo: 'carga',
+                            id: Date.now(),
+                            x1: (pontoInicialCarga.x - tamanhoGrelha) / tamanhoGrelha,
+                            y1: (pontoInicialCarga.y - tamanhoGrelha) / tamanhoGrelha,
+                            x2: (this.x() - tamanhoGrelha) / tamanhoGrelha,
+                            y2: (this.y() - tamanhoGrelha) / tamanhoGrelha
+                        };
+                        sistemaEstatico.cargas.push(cargaData);
+                        hearMeOut();
+                        
                         const carga = new Konva.Arrow({
                             points: [this.x(), this.y(), pontoInicialCarga.x, pontoInicialCarga.y], 
                             pointerLength: 10, 
@@ -374,8 +425,10 @@ function desenharGrelha() {
                             fill: '#dc3545', 
                             stroke: '#dc3545', 
                             strokeWidth: 4, 
-                            listening: true
+                            listening: true,
+                            id: cargaData.id
                         });
+                        
 
                         carga.on('click tap', function(e) {
                             if (window.ferramentaAtual === 'Selecionar') {
@@ -426,9 +479,20 @@ function desenharGrelha() {
                 
                 // --- INSERIR NÓ ---
                 if (window.ferramentaAtual === 'Inserir Nó') {
+                    const noData ={
+                        tipo: 'nos',
+                        id: Date.now(),
+                        x: (this.x() - tamanhoGrelha) / tamanhoGrelha,
+                        y: (this.y() - tamanhoGrelha) / tamanhoGrelha
+                    }; 
+                    sistemaEstatico.nos.push(noData);
+                    hearMeOut();
+
                     const noEstrutural = new Konva.Circle({ 
-                        x: this.x(), y: this.y(), radius: 5, fill: '#212529', listening: true 
+                        x: this.x(), y: this.y(), radius: 5, fill: '#212529', listening: true, id: noData.id 
                     });
+                    
+                    
 
                     noEstrutural.on('click tap', function(e) {
                         if (window.ferramentaAtual === 'Selecionar') {
@@ -502,6 +566,15 @@ document.addEventListener('keydown', function(event) {
 
 function apagarBarra() {
     if (barraSelecionada) {
+            const idParaRemover = barraSelecionada.id();
+
+            sistemaEstatico.barras = sistemaEstatico.barras.filter(b => b.id !== idParaRemover);
+            sistemaEstatico.apoiosFixos = sistemaEstatico.apoiosFixos.filter(a => a.id !== idParaRemover);
+            sistemaEstatico.apoiosSimples = sistemaEstatico.apoiosSimples.filter(a => a.id !== idParaRemover);
+            sistemaEstatico.cargas = sistemaEstatico.cargas.filter(c => c.id !== idParaRemover);
+            sistemaEstatico.nos = sistemaEstatico.nos.filter(n => n.id !== idParaRemover);
+            hearMeOut();
+
             if (barraSelecionada.name() === 'trianguloApoioSimples' && barraSelecionada.getParent()) {
                 barraSelecionada.getParent().destroy();
             } else {
@@ -518,11 +591,21 @@ function apagarBarra() {
     }
 }
 
+<<<<<<< HEAD
 function apagarTodaEstrutura() {
+=======
+window.apagarTodaEstrutura = function() {
+    sistemaEstatico.barras.length = 0;
+    sistemaEstatico.apoiosFixos.length = 0;
+    sistemaEstatico.apoiosSimples.length = 0;
+    sistemaEstatico.nos.length = 0;
+    sistemaEstatico.cargas.length = 0;
+>>>>>>> 2585475f3645e58a69bbe40579d23ae9f5cd1dde
     cancelarDesenhoBarra();
     limparSelecao();
     layerEstrutura.destroyChildren();
     layerEstrutura.draw();
+    hearMeOut();
     console.log("🧹 Toda a estrutura foi apagada da tela!");
 };
 
@@ -542,3 +625,8 @@ stage.on('click tap', function (e) {
         }
     }
 });
+
+function hearMeOut(){
+    const eventoMudanca = new CustomEvent('estruturaAlterada', { detail: sistemaEstatico });
+    window.dispatchEvent(eventoMudanca);
+}
