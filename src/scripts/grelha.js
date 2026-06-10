@@ -591,16 +591,12 @@ function apagarBarra() {
     }
 }
 
-<<<<<<< HEAD
 function apagarTodaEstrutura() {
-=======
-window.apagarTodaEstrutura = function() {
     sistemaEstatico.barras.length = 0;
     sistemaEstatico.apoiosFixos.length = 0;
     sistemaEstatico.apoiosSimples.length = 0;
     sistemaEstatico.nos.length = 0;
     sistemaEstatico.cargas.length = 0;
->>>>>>> 2585475f3645e58a69bbe40579d23ae9f5cd1dde
     cancelarDesenhoBarra();
     limparSelecao();
     layerEstrutura.destroyChildren();
