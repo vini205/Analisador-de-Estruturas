@@ -30,7 +30,7 @@ btnApagar.addEventListener('click',()=>{
     // --- APAGAR TUDO ---
         if (window.ferramentaAtual === 'Apagar') {
 
-            window.apagarTodaEstrutura();
+            apagarTodaEstrutura();
             
             // Nós forçamos um clique no botão "Selecionar" 
             const botaoSelecionar = document.querySelector('[title="Selecionar (Mover)"]');

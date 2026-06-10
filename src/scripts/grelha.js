@@ -518,7 +518,7 @@ function apagarBarra() {
     }
 }
 
-window.apagarTodaEstrutura = function() {
+function apagarTodaEstrutura() {
     cancelarDesenhoBarra();
     limparSelecao();
     layerEstrutura.destroyChildren();
