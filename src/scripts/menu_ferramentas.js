@@ -1,22 +1,30 @@
-// --- LÓGICA DO MENU DE FERRAMENTAS ---
+// ==========================================
+// LÓGICA DO MENU DE FERRAMENTAS
+// ==========================================
 
-// 1. Selecionamos todos os botões que têm a classe 'toolbar-btn'
+// 1. Selecionamos todos os botões da barra de ferramentas
 const botoesMenu = document.querySelectorAll('.toolbar-btn');
 
-// Variável global para sabermos qual é a ferramenta ativa neste momento
-// Usamos window.ferramentaAtual para que o outro arquivo (grelha.js) consiga ler
+// Variável global lida pelo grelha.js para saber o que desenhar
 window.ferramentaAtual = 'Inserir Barra'; 
-
 
 botoesMenu.forEach(botao => {
     botao.addEventListener('click', function() {
+        // Remove o visual 'ativo' de todos e coloca apenas no clicado
         botoesMenu.forEach(b => b.classList.remove('active'));
         this.classList.add('active');
         
         // Atualiza a ferramenta global
         window.ferramentaAtual = this.querySelector('span').innerText;
         
-        // Cancela desenhos pendentes sempre que trocar de ferramenta
+        // --- INTEGRAÇÃO COM A NOVA GRELHA ---
+        
+        // 1. Desmarca qualquer elemento que estivesse selecionado
+        if (typeof limparSelecao === 'function') {
+            limparSelecao();
+        }
+
+        // 2. Cancela qualquer desenho pendente (ex: se o utilizador deu 1 clique na Barra/Carga e trocou de ferramenta)
         if (typeof window.cancelarDesenhoBarra === 'function') {
             window.cancelarDesenhoBarra();
         }
@@ -25,20 +33,35 @@ botoesMenu.forEach(botao => {
     });
 });
 
-const btnApagar = document.querySelector('#confirmarApagarGrelha')
-btnApagar.addEventListener('click',()=>{
-    // --- APAGAR TUDO ---
+
+// ==========================================
+// LÓGICA DE APAGAR TODA A ESTRUTURA (MODAL)
+// ==========================================
+const btnApagar = document.querySelector('#confirmarApagarGrelha');
+
+if (btnApagar) {
+    btnApagar.addEventListener('click', () => {
+        // Apenas apaga tudo se a intenção for realmente o "Apagar"
         if (window.ferramentaAtual === 'Apagar') {
 
-            apagarTodaEstrutura();
+            // Chama a nossa nova função refatorada que limpa as classes e os arrays
+            if (typeof apagarTodaEstrutura === 'function') {
+                apagarTodaEstrutura();
+            }
             
-            // Nós forçamos um clique no botão "Selecionar" 
+            // Força a mudança para a ferramenta "Selecionar" logo após apagar a tela, 
+            // evitando que o utilizador continue a apagar coisas sem querer.
             const botaoSelecionar = document.querySelector('[title="Selecionar (Mover)"]');
             if (botaoSelecionar) {
                 botaoSelecionar.click(); 
             }
+            
+            // Fecha o Modal do Bootstrap de forma segura
             const modalElement = document.getElementById('eraseGridModal');
-            const modalInstance = bootstrap.Modal.getInstance(modalElement);
-            modalInstance.hide();
+            if (modalElement) {
+                const modalInstance = bootstrap.Modal.getInstance(modalElement) || new bootstrap.Modal(modalElement);
+                modalInstance.hide();
+            }
         } 
-})
+    });
+}

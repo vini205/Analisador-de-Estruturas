@@ -1,4 +1,4 @@
-const header = document.querySelector('header');
+/* const header = document.querySelector('header');
 const containerGrelha = document.getElementById('container');
 if (header && containerGrelha) {
     
@@ -12,7 +12,7 @@ if (header && containerGrelha) {
         });
 
         document.addEventListener('mousemove', (e) => {
-            if (e.clientY < 60) {
+            if (e.clientY < 30) {
                 if (header.classList.contains('header-oculto')) {
                     header.classList.remove('header-oculto');
                 }
@@ -51,4 +51,4 @@ if (header && containerGrelha) {
         }, { passive: true });
     }
         
-} 
+}  */
