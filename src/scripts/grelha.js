@@ -243,13 +243,13 @@ function apagarTodaEstrutura() {
     layerEstrutura.draw();
     console.log("🧹 Toda a estrutura foi apagada da tela!");
 }
-// 8. INTERAÇÕES COM O STAGE (FUNDO)
+/* // 8. INTERAÇÕES COM O STAGE (FUNDO)
 document.addEventListener('click', function(e) {
     const container = document.getElementById('container');
     if (container && !container.contains(e.target)) {
         limparSelecao();
     }
-});
+}); */
 
 stage.on('click tap', function (e) {
     if (e.target === stage) {

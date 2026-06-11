@@ -3,7 +3,9 @@
     padding: 20px 10%;
     touch-action: none;
 }
-
+body{
+    overflow-y: visible;
+}
 header.container-fluid {
     position: absolute;
     top: 0;
@@ -12,6 +14,16 @@ header.container-fluid {
     margin-bottom: 0;
     overflow: hidden; /* Garante que o texto suma ao encolher */
     transition: max-height 2s ease-in-out, margin-top 0.4s ease-in-out, visibility 0.4s;
+}
+::-webkit-scrollbar-track {
+    background-color: #F4F4F4;
+}
+::-webkit-scrollbar {
+    width: 6px;
+    background: #F4F4F4;
+}
+::-webkit-scrollbar-thumb {
+    background: #dad7d7;
 }
 
 @media (max-width: 768px) {
@@ -29,6 +41,10 @@ header.container-fluid {
         font-size: 15px;
         top:5%;
 
+    }
+    .toolbar-container{
+        position: fixed;
+        bottom: 1%;
     }
 
 }
@@ -69,6 +85,8 @@ main#main:nth-child(2) {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05); /* Sombra suave profissional */
     border: 1px solid #ced4da;
     justify-content: center;
+    margin-left: 5px;
+    margin-right: 5px;
 }
 
 /* Estilo de cada botão do menu */
