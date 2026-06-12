@@ -249,6 +249,7 @@ function apagarElementoSelecionado() {
 }
 
 function apagarTodaEstrutura() {
+    sistemaEstatico.barras.length = 0;
     const todosElementos = [
         ...sistemaEstatico.barras,
         ...sistemaEstatico.cargas,
