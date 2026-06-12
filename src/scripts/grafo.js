@@ -10,20 +10,24 @@ function inserirBarra(sistema, barra){
 
     const pontosI = interceptaPonto(barra);
     for(let i=1; i<pontosI.length-1; i++){
-        const barraCortada = {dados: { ...barra.dados, apoios1: [...barra.dados.apoios1],
-                                            apoios2: [...barra.dados.apoios2],
-                                            cargas1: [...barra.dados.cargas1],
-                                            cargas2: [...barra.dados.cargas2]}};
+        const barraCortada = {dados: { ...barra.dados, apoios1: [],
+                                            apoios2: [],
+                                            cargas1: [],
+                                            cargas2: []}};
         barraCortada.dados.x2 = pontosI[i].x;
         barraCortada.dados.y2 = pontosI[i].y;
         sistema.barras.push(barraCortada);
         pontosI[i-1].barras1.push(barraCortada);
         pontosI[i].barras2.push(barraCortada);
         
-        barraCortada.apoios1 =  pontosI[i-1].apoios;
-        barraCortada.apoios2 =  pontosI[i].apoios;
-        barraCortada.cargas1 =  pontosI[i-1].cargas;
-        barraCortada.cargas2 =  pontosI[i].cargas;
+        barraCortada.dados.apoios1 =  [...pontosI[i-1].apoios];
+        barraCortada.dados.apoios2 =  [...pontosI[i].apoios];
+        barraCortada.dados.cargas1 =  [...pontosI[i-1].cargas];
+        barraCortada.dados.cargas2 =  [...pontosI[i].cargas];
+
+        colocarApoiosPonto(pontosI[i-1], barraCortada, barraCortada.dados.apoios2, barraCortada.dados.cargas2);
+        colocarApoiosPonto(pontosI[i], barraCortada, barraCortada.dados.apoios1, barraCortada.dados.cargas1);
+
 
         barra.dados.x1 = barraCortada.dados.x2;
         barra.dados.y1 = barraCortada.dados.y2;

@@ -115,13 +115,32 @@ function calcularResultantes(cargas){
 }
 
 function calcularFuncaoBarra(barra){
+    let [Rx, Ry, Mr] = calcularResultantes(barra.dados.cargas1);
+
+    if(barra.dados.x1 === barra.dados.x2){
+        const sinal = (barra.dados.y1 > barra.dados.y2) ? 1 : -1;
+
+        matriz3 = new MatrizSimbolica(3,3);
+        matriz3.definir(0,0, 0); matriz3.definir(0,1, -1*sinal); matriz3.definir(0,2, 0);
+        matriz3.definir(1,0, 1*sinal); matriz3.definir(1,1, 0); matriz3.definir(1,2, 0);
+        matriz3.definir(2,0, sinal*barra.dados.x1); matriz3.definir(2,1, (sinal*(barra.dados.y1)).toString() + "+x"); matriz3.definir(2,2, 1);
+        
+        const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
+        console.log(solucao);
+        barra.dados.N = solucao[0];
+        barra.dados.V = -solucao[1];
+        barra.dados.M = solucao[2];
+
+        return;
+    }
+
     
     const tangente = (barra.dados.y1 -barra.dados.y2)/((barra.dados.x2 -barra.dados.x1))
     const cosAbsoluto = 1 / Math.sqrt(1 + Math.pow(tangente, 2));
     const cosseno = tangente >= 0 ? cosAbsoluto : -cosAbsoluto;
     const seno = tangente * cosseno;
 
-    let [Rx, Ry, Mr] = calcularResultantes(barra.dados.cargas1);
+    
     for(const apoio of barra.dados.apoios1){
         if(apoio.dados.tipo == "apoioFixo"){
             Rx += apoio.dados.fx;
