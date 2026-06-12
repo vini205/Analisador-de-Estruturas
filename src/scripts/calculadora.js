@@ -8,8 +8,10 @@ function calcularTudo(sistemaNovo){
         console.log("APOIOS SIMPLES:\n", sistemaNovo.apoiosSimples);
         //implementar a impressao com o acima
 
-        //verificando os nos:
-
+        //calculando as barras
+        for(const barra of sistemaNovo.barras){
+            calcularFuncaoBarra(barra);
+        }
     }catch(erro){
         //imprime ou não o o erro
         console.log(erro.message);
@@ -47,7 +49,7 @@ function calcularReacoes(sistema){
                 | c d || f2 |   | -M   |
              */
             matriz2 = new MatrizSimbolica(2, 2);
-            matriz2.definir(0,0, 1); matriz2.definir(0,0, 1);
+            matriz2.definir(0,0, 1); matriz2.definir(0,1, 1);
             matriz2.definir(1,0, sistema.apoiosSimples[0].dados.x); matriz2.definir(1,1, sistema.apoiosSimples[1].dados.x);
             
             solucao = matriz2.resolverCramer([-Ry, -M]).solucoes.map(Number);
@@ -102,12 +104,62 @@ function calcularReacoes(sistema){
     }
 }
 
-function calcularResultantes(forcas){
+function calcularResultantes(cargas){
     let [Rx, Ry, M]=[0,0,0];
-    for(const forca of forcas){
+    for(const forca of cargas){
         Rx += forca.dados.x1 - forca.dados.x2;
         Ry += - forca.dados.y1 + forca.dados.y2;
         M += (forca.dados.x1 - forca.dados.x2)*(-forca.dados.y1) + (forca.dados.y2 - forca.dados.y1)*forca.dados.x1;
     }
     return [Rx, Ry, M];
+}
+
+function calcularFuncaoBarra(barra){
+    
+    const tangente = (barra.dados.y1 -barra.dados.y2)/((barra.dados.x2 -barra.dados.x1))
+    const cosAbsoluto = 1 / Math.sqrt(1 + Math.pow(tangente, 2));
+    const cosseno = tangente >= 0 ? cosAbsoluto : -cosAbsoluto;
+    const seno = tangente * cosseno;
+
+    let [Rx, Ry, Mr] = calcularResultantes(barra.dados.cargas1);
+    for(const apoio of barra.dados.apoios1){
+        if(apoio.dados.tipo == "apoioFixo"){
+            Rx += apoio.dados.fx;
+            Ry += apoio.dados.fy;
+            Mr += apoio.dados.fx*apoio.dados.y + apoio.dados.fy*apoio.dados.x;
+        }
+        else{
+            Ry += apoio.dados.f;
+            Mr += apoio.dados.f*apoio.dados.x;
+        }
+    }
+    console.log(Rx, Ry, Mr);
+    /* MATRIZ
+        | a b c || N  |   | -Rx  |
+        | d e f || -V |   | -Ry  |
+        | g h i || M  |   | -Mr  |
+
+    onde a=cos, b=-sen, c=0
+         d=sen, e=cos,  f=0,
+         g=k*cos; h=-sen*(k)+raiz(x1²+(y1-k)²)+x; i=1
+        (sendo k=y1+tan*x1)
+
+    */
+    const x1 = barra.dados.x1;
+    const y1 = barra.dados.y1;
+    const k = y1 + (tangente*x1);
+    const h = (-seno*k + Math.sqrt(x1*x1 + (y1-k)*(y1-k)));
+
+    matriz3 = new MatrizSimbolica(3, 3);
+
+
+    matriz3.definir(0,0, cosseno); matriz3.definir(0,1, -seno); matriz3.definir(0,2, 0);
+    matriz3.definir(1,0, seno); matriz3.definir(1,1, cosseno); matriz3.definir(1,2, 0);
+    matriz3.definir(2,0, k*cosseno); matriz3.definir(2,1, h.toString()+"+x"); matriz3.definir(2,2, 1);
+
+    const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
+    console.log(solucao);
+    barra.dados.N = solucao[0];
+    barra.dados.V = -solucao[1];
+    barra.dados.M = solucao[2];
 }
