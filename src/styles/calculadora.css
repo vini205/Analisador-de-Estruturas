@@ -15,16 +15,19 @@ header.container-fluid {
     overflow: hidden; /* Garante que o texto suma ao encolher */
     transition: max-height 2s ease-in-out, margin-top 0.4s ease-in-out, visibility 0.4s;
 }
-::-webkit-scrollbar-track {
-    background-color: #F4F4F4;
+
+
+/*OCULAar as divisões*/
+@media (max-width: 575.98px) {
+    .toolbar-divider {
+        display: none !important;
+    }
+    div#container{
+        margin-bottom: 162px;
+        /*Compensar o tamanho da barra de ferramentas fixa na tela*/
+    }
 }
-::-webkit-scrollbar {
-    width: 6px;
-    background: #F4F4F4;
-}
-::-webkit-scrollbar-thumb {
-    background: #dad7d7;
-}
+
 
 @media (max-width: 768px) {
     header.container-fluid{
@@ -87,6 +90,8 @@ main#main:nth-child(2) {
     justify-content: center;
     margin-left: 5px;
     margin-right: 5px;
+    overflow-y: auto;
+    max-height: 130px;
 }
 
 /* Estilo de cada botão do menu */
@@ -136,6 +141,10 @@ main#main:nth-child(2) {
 .toolbar-btn.btn-delete:hover {
     background-color: #fff5f5;
     color: #dc3545; /* Vermelho de alerta */
+}
+.toolbar-btn.btn-resultado:hover {
+    background-color: #f0fff0;
+    color: #30c38b; 
 }
 
 /* Divisor vertical entre grupos de ferramentas */

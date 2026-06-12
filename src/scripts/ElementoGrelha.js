@@ -3,11 +3,12 @@
 // 5. CLASSE BASE ESTRUTURAL
 // ==========================================
 class ElementoGrelha {
-    constructor(tipo, shape, arrayDestino, dados = {}) {
+    constructor(tipo, shape, arrayDestino, dados = {},label) {
         this.tipo = tipo;
         this.shape = shape;
         this.arrayDestino = arrayDestino;
         this.dados = dados;
+        this.label = label;
 
         this.shape.setAttr('elementoRef', this);
         this.init();

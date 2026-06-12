@@ -34,16 +34,18 @@ const stage = new Konva.Stage({
     height: height,
 });
 
-const layerGrelha = new Konva.Layer();
 const layerEstrutura = new Konva.Layer(); 
-stage.add(layerGrelha);
-stage.add(layerEstrutura);
+const layerGrelha = new Konva.Layer();
+const layerUI = new Konva.Layer(); // PARA O TOOLTIP
 
+stage.add(layerEstrutura); 
+stage.add(layerGrelha);   
+stage.add(layerUI);
 
 // 3. FUNÇÃO DE CANCELAMENTO
 window.cancelarDesenhoBarra = function() {
     let cancelouAlgo = false;
-
+    limparSelecao();
     // Desmarca o Ponto Inicial da Barra (Azul)
     if (window.pontoInicialBarra && window.pontoInicialBarra.referencia) {
         window.pontoInicialBarra.referencia.fill('#a0a0a0'); 
@@ -63,6 +65,7 @@ window.cancelarDesenhoBarra = function() {
     // Só redesenha a grelha se realmente desmarcou alguma bolinha
     if (cancelouAlgo) {
         layerGrelha.draw();
+        layerUI.draw()
         console.log("✏️ Ação pendente cancelada e grelha limpa.");
     }
 };
@@ -108,33 +111,43 @@ function recalcularPosicoesEstrutura(proporcao) {
     });    
     console.log(`📏 Estrutura ajustada à nova escala (Proporção: ${proporcao})`);
 }
+function criaLabel(dados) {
+    let dx= (dados.x1 - dados.x2);
+    let dy = (dados.y1 - dados.y2);
+    const comprimento = Math.sqrt( dx*dx + dy*dy ).toFixed(2);
+    const angulo = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(2);
+    return ` ${dados.tipo}:\nL: ${comprimento}\n θ: ${angulo}º`
 
+}
 // 6. FACTORY FUNCTIONS (CRIADORES DE OBJETOS)
 function criarBarra(x1, y1, x2, y2) {
     const id = Date.now();
+    
     const dados = {
-        tipo: 'barra', id: id,
+        tipo: 'Barra', id: id,
         x1: (x1 - tamanhoGrelha) / tamanhoGrelha, y1: (y1 - tamanhoGrelha) / tamanhoGrelha,
         x2: (x2 - tamanhoGrelha) / tamanhoGrelha, y2: (y2 - tamanhoGrelha) / tamanhoGrelha
     };
-    
+
+    let label = criaLabel(dados);  
     const barraKonva = new Konva.Line({
         points: [x1, y1, x2, y2], stroke: '#212529', strokeWidth: 5, 
         hitStrokeWidth: 15, lineCap: 'round', lineJoin: 'round', id: id
     });
     
     if (typeof hearMeOut === 'function') hearMeOut(); 
-    return new ElementoGrelha('barra', barraKonva, sistemaEstatico.barras, dados);
+    return new ElementoGrelha('barra', barraKonva, sistemaEstatico.barras, dados, label);
 }
 
 function criarCarga(xCauda, yCauda, xPonta, yPonta) {
     const id = Date.now();
     const dados = {
-        tipo: 'carga', id: id,
+        tipo: 'C    arga', id: id,
         x1: (xPonta - tamanhoGrelha) / tamanhoGrelha, y1: (yPonta - tamanhoGrelha) / tamanhoGrelha,
         x2: (xCauda - tamanhoGrelha) / tamanhoGrelha, y2: (yCauda - tamanhoGrelha) / tamanhoGrelha
     };
 
+    let label = criaLabel(dados);  
     const cargaKonva = new Konva.Arrow({
         points: [xCauda, yCauda, xPonta, yPonta], 
         pointerLength: 10, pointerWidth: 10, fill: '#dc3545', 
@@ -142,7 +155,7 @@ function criarCarga(xCauda, yCauda, xPonta, yPonta) {
     });
     
     if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('carga', cargaKonva, sistemaEstatico.cargas, dados);
+    return new ElementoGrelha('carga', cargaKonva, sistemaEstatico.cargas, dados, label);
 }
 
 function criarApoioFixo(x, y) {
@@ -155,7 +168,7 @@ function criarApoioFixo(x, y) {
     });
     
     if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('apoioFixo', apoioKonva, sistemaEstatico.apoiosFixos, dados);
+    return new ElementoGrelha('apoioFixo', apoioKonva, sistemaEstatico.apoiosFixos, dados, "Apoio Fixo");
 }
 
 function criarApoioSimples(x, y) {
@@ -169,7 +182,7 @@ function criarApoioSimples(x, y) {
     apoioSimplesGrupo.add(triangulo, circulinhoBranco);
     
     if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('apoioSimples', apoioSimplesGrupo, sistemaEstatico.apoiosSimples, dados);
+    return new ElementoGrelha('apoioSimples', apoioSimplesGrupo, sistemaEstatico.apoiosSimples, dados, "Apoio Simples");
 }
 
 function criarNo(x, y) {
@@ -179,7 +192,7 @@ function criarNo(x, y) {
     const noKonva = new Konva.Circle({ x: x, y: y, radius: 5, fill: '#212529', id: id });
     
     if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('nos', noKonva, sistemaEstatico.nos, dados);
+    return new ElementoGrelha('nos', noKonva, sistemaEstatico.nos, dados, "Nó");
 }
 
 
@@ -199,7 +212,7 @@ function selecionarElemento(elemento) {
         // Se o ToolTip existir, chama ele passando as informações
         if (typeof fazerToolTip === 'function') {
             const pts = elemento.shape.points ? elemento.shape.points() : [elemento.shape.x(), elemento.shape.y()];
-            fazerToolTip(pts, elemento.tipo);
+            fazerToolTip(pts, elemento.label);
         }
     }
 }
@@ -210,6 +223,11 @@ function limparSelecao() {
         elementoSelecionado.restaurarCorOriginal(); 
         elementoSelecionado = null;
         layerEstrutura.draw();
+    }
+    if (tooltipInspecao != null && tooltipInspecao != 'undefined') {
+        tooltipInspecao.destroy()
+        tooltipInspecao = null
+        layerUI.draw()
     }
 }
 
@@ -243,13 +261,13 @@ function apagarTodaEstrutura() {
     layerEstrutura.draw();
     console.log("🧹 Toda a estrutura foi apagada da tela!");
 }
-/* // 8. INTERAÇÕES COM O STAGE (FUNDO)
+ // 8. INTERAÇÕES COM O STAGE (FUNDO)
 document.addEventListener('click', function(e) {
     const container = document.getElementById('container');
     if (container && !container.contains(e.target)) {
         limparSelecao();
     }
-}); */
+}); 
 
 stage.on('click tap', function (e) {
     if (e.target === stage) {
@@ -394,8 +412,6 @@ desenharGrelha();
 
 function fazerToolTip(pts, infoLabel) {
     if (tooltipInspecao) tooltipInspecao.destroy();
-
-    // Calcula a posição (Centro da linha para Barras/Cargas, ou em cima do ponto para Nós/Apoios)
     let posX, posY;
     if (pts.length >= 4) {
         posX = (pts[0] + pts[2]) / 2;
@@ -404,7 +420,6 @@ function fazerToolTip(pts, infoLabel) {
         posX = pts[0];
         posY = pts[1];
     }
-
     tooltipInspecao = new Konva.Group({
         x: posX, 
         y: posY - 25,
@@ -415,16 +430,14 @@ function fazerToolTip(pts, infoLabel) {
         shadowColor: 'black', shadowBlur: 4, shadowOpacity: 0.3, shadowOffset: { x: 0, y: 2 }
     });
     
-    // Texto Menor (Fonte de 13 para 11)
+
     const infoTexto = new Konva.Text({
         x: -40, y: -25, text: infoLabel,
         fontFamily: 'Arial', fontSize: 11, fill: 'white', width: 80, align: 'center', lineHeight: 1.2
     });
     
-    // Ponta (Triângulo) ajustada para a nova altura do fundo
     const ponta = new Konva.Line({ points: [-5, 20, 5, 20, 0, 26], fill: '#343a40', closed: true });
     
-    // Botão de apagar menor e centralizado
     const botaoApagarGrupo = new Konva.Group({ x: -25, y: 1, listening: true });
     const fundoBotao = new Konva.Rect({ width: 50, height: 16, fill: '#dc3545', cornerRadius: 3 });
     const textoBotao = new Konva.Text({
@@ -433,7 +446,6 @@ function fazerToolTip(pts, infoLabel) {
     
     botaoApagarGrupo.add(fundoBotao, textoBotao);
     
-    // --- AÇÃO DO BOTÃO ---
     botaoApagarGrupo.on('click tap', function(e) { 
         e.cancelBubble = true; 
         apagarElementoSelecionado(); 
@@ -443,7 +455,6 @@ function fazerToolTip(pts, infoLabel) {
     botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
 
     tooltipInspecao.add(fundoTooltip, ponta, infoTexto, botaoApagarGrupo);
-    layerEstrutura.add(tooltipInspecao);
-    tooltipInspecao.moveToTop(); // Mantém sempre à frente de tudo
-    layerEstrutura.draw();
+    layerUI.add(tooltipInspecao);
+    layerUI.draw();
 }
