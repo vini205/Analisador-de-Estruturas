@@ -1,16 +1,21 @@
-const pontos = []; 
+let pontos = []; 
 //um ponto eh dado por x:, y:, barras1:(barras com x1,y1 = x,y), barras2: 
 let conexo = true;
 let ciclico = false;
 
 
 function inserirBarra(sistema, barra){
-    procurarPonto(barra.x1, barra.y1);
-    procurarPonto(barra.x2, barra.y2);
+    procurarPonto(barra.dados.x1, barra.dados.y1);
+    procurarPonto(barra.dados.x2, barra.dados.y2);
 
     const pontosI = interceptaPonto(barra);
-    for(const i=1; i<pontosI.length-1; i++){
-        const barraCortada ={x1: barra.x1, y1: barra.y1, x2: pontosI[i].x, y2: postosI[i].y, id:barra.id};
+    for(let i=1; i<pontosI.length-1; i++){
+        const barraCortada = {dados: { ...barra.dados, apoios1: [...barra.dados.apoios1],
+                                            apoios2: [...barra.dados.apoios2],
+                                            cargas1: [...barra.dados.cargas1],
+                                            cargas2: [...barra.dados.cargas2]}};
+        barraCortada.dados.x2 = pontosI[i].x;
+        barraCortada.dados.y2 = pontosI[i].y;
         sistema.barras.push(barraCortada);
         pontosI[i-1].barras1.push(barraCortada);
         pontosI[i].barras2.push(barraCortada);
@@ -20,74 +25,108 @@ function inserirBarra(sistema, barra){
         barraCortada.cargas1 =  pontosI[i-1].cargas;
         barraCortada.cargas2 =  pontosI[i].cargas;
 
-        barraCortada.apoios1 = pontosI[i-2].
-        barra.x1 = barraCortada.x2;
-        barra.y1 = barraCortada.y2;
+        barra.dados.x1 = barraCortada.dados.x2;
+        barra.dados.y1 = barraCortada.dados.y2;
     }
+    
     pontosI[pontosI.length-2].barras1.push(barra);
     pontosI[pontosI.length-1].barras2.push(barra);
-    barra.apoios1 =  pontosI[pontosI.length-2].apoios;
-    barra.cargas1 =  pontosI[pontosI.length-2].cargas;
-    barra.apoios2 =  pontosI[pontosI.length-1].apoios;
-    barra.cargas2 =  pontosI[pontosI.length-1].cargas;
+    barra.dados.apoios1.push(...pontosI[pontosI.length-2].apoios);
+    barra.dados.cargas1.push(...pontosI[pontosI.length-2].cargas);
+    barra.dados.apoios2.push(...pontosI[pontosI.length-1].apoios);
+    barra.dados.cargas2.push(...pontosI[pontosI.length-1].cargas);
 
-    colocarApoiosPonto(pontosI[pontosI.length -2], barra, pontosI[pontosI.length -1].apoio);
-    colocarApoiosPonto(pontosI[pontosI.length -1], barra, pontosI[pontosI.length -2].apoio);
+    colocarApoiosPonto(pontosI[pontosI.length -2], barra, barra.dados.apoios2, barra.dados.cargas2);
+    colocarApoiosPonto(pontosI[pontosI.length -1], barra, barra.dados.apoios1, barra.dados.cargas1);
 }
 
 function inserirCarga(carga){
-    const ponto =  procurarPonto(carga.x, carga.y);
-    colocarApoiosPonto(ponto, {}, [], [carga]);
+    const ponto =  procurarPonto(carga.dados.x1, carga.dados.y1);
+    colocarApoiosPonto(ponto, {dados:{}}, [], [carga]);
 }
 
 function inserirApoio(apoio){
-    const ponto =  procurarPonto(apoio.x, apoio.y);
-    colocarApoiosPonto(ponto, {}, [apoio], []);
+    const ponto =  procurarPonto(apoio.dados.x, apoio.dados.y);
+    colocarApoiosPonto(ponto, {dados:{}}, [apoio], []);
 }
 
-function inserirNo(no){
-    const barra = interceptaBarra(no, sistemaEstatico);
+function inserirNo(no){     
+    const barra = interceptaBarra(no.dados, sistemaEstatico);
     if(barra != null) barra.nos.push(no);
 }
 
 function removerBarra(barra){
-    const p1 = procurarPonto(barra.x1, barra.y1);
-    const p2 = procurarPonto(barra.x2, barra.y2);
+    const p1 = procurarPonto(barra.dados.x1, barra.dados.y1);
+    const p2 = procurarPonto(barra.dados.x2, barra.dados.y2);
 
-    removerApoiosPonto(p1, barra, barra.apoios2, barra.cargas2);
-    removerApoiosPonto(p2, barra, barra.apoios1, barra.cargas1);
+    removerApoiosPonto(p1, barra, barra.dados.apoios2, barra.dados.cargas2);
+    removerApoiosPonto(p2, barra, barra.dados.apoios1, barra.dados.cargas1);
+
+    p1.barras1 = p1.barras1.filter(b => b.dados.id != barra.dados.id);
+    p2.barras2 = p2.barras2.filter(b => b.dados.id != barra.dados.id);
+
+    if(p1.apoios.length + p1.barras1.length + p1.barras2.length + p1.cargas.length == 0){
+        pontos = pontos.filter(ps => (ps.x != p1.x || ps.y != p1.y))
+    }
+    if(p2.apoios.length + p2.barras1.length + p2.barras2.length + p2.cargas.length == 0){
+        pontos = pontos.filter(ps => (ps.x != p2.x || ps.y != p2.y))
+    }
 
     if(ciclico) refazerGrafo(sistemaEstatico);
 }
 
 function removerApoio(apoio){
-    const p = procurarPonto(apoio.x, apoio.y);
+    const p = procurarPonto(apoio.dados.x, apoio.dados.y);
 
     removerApoiosPonto(p, {}, [apoio], []);
+    if(p.apoios.length + p.barras1.length + p.barras2.length + p.cargas.length == 0){
+        pontos = pontos.filter(ps => (ps.x != p.x || ps.y != p.y))
+    }
 }
 
 function removerCarga(carga){
-    const p = procurarPonto(carga.x, carga.y);
+    const p = procurarPonto(carga.dados.x1, carga.dados.y1);
 
     removerApoiosPonto(p, {}, [], [carga]);
+    if(p.apoios.length + p.barras1.length + p.barras2.length + p.cargas.length == 0){
+        pontos = pontos.filter(ps => (ps.x != p.x || ps.y != p.y))
+    }
 }
 
+function removerObjetoGrafo(objeto){
+    switch (objeto.tipo) {
+        case "barra":
+            removerBarra(objeto);
+            break;
+        case "apoioFixo":
+            removerApoio(objeto);
+            break;
+        case "apoioSimples":
+            removerApoio(objeto);
+            break;
+        case "carga":
+            removerCarga(objeto);
+            break;
+        default:
+            break;
+    }
+}
 
 function colocarApoiosPonto(ponto, barraOrigem, apoios, cargas){
   if(ciclico) return;
-
   //Checar se eh ciclico
-  for(const apoioP in ponto.apoios){
-    for(const apoio in apoios){
-        if(apoio == apoioP){ 
+  for(const apoioP of ponto.apoios){
+    for(const apoio of apoios){
+        if(apoio.dados.id === apoioP.dados.id){ 
             ciclico=true;
             limparGrafo(sistemaEstatico);
-            return;}
+            return;
+        }
     }
   }
-  for(const cargaP in ponto.cargas){
-    for(const carga in cargas){
-        if(carga == cargaP){ 
+  for(const cargaP of ponto.cargas){
+    for(const carga of cargas){
+        if(carga.dados.id === cargaP.dados.id){ 
             ciclico=true;
             limparGrafo(sistemaEstatico);
             return;}
@@ -97,17 +136,20 @@ function colocarApoiosPonto(ponto, barraOrigem, apoios, cargas){
   ponto.apoios.push(...apoios)
   ponto.cargas.push(...cargas)
 
-  for(const barra of ponto.barras1){
-    if(barra === barraOrigem) continue;
-    barra.apoios1.push(...apoios);
-    barra.cargas1.push(...cargas);
-    colocarApoiosPonto(procurarPonto(barra.x2,barras.y2), barra, apoios, cargas);
+  const pontoFiltrado = {...ponto, 
+                         barras1: ponto.barras1.filter(b => b != barraOrigem),
+                         barras2: ponto.barras2.filter(b => b != barraOrigem)
+                            }
+
+  for(const barra of pontoFiltrado.barras1){
+    barra.dados.apoios1.push(...apoios);
+    barra.dados.cargas1.push(...cargas);
+    colocarApoiosPonto(procurarPonto(barra.dados.x2,barra.dados.y2), barra, apoios, cargas);
   }
-  for(const barra of ponto.barras2){
-    if(barra === barraOrigem) continue;
-    barra.apoios2.push(...apoios);
-    barra.cargas2.push(...cargas);
-    colocarApoiosPonto(procurarPonto(barra.x1,barras.y1), barra, apoios, cargas);
+  for(const barra of pontoFiltrado.barras2){
+    barra.dados.apoios2.push(...apoios);
+    barra.dados.cargas2.push(...cargas);
+    colocarApoiosPonto(procurarPonto(barra.dados.x1,barra.dados.y1), barra, apoios, cargas);
   }
 }
 
@@ -115,36 +157,39 @@ function removerApoiosPonto(ponto, barraOrigem, apoios, cargas){
     if(ciclico) return;
 
     //Checar se eh ciclico
-    for(const apoioP in ponto.apoios){
-        for(const apoio in apoios){
-            if(apoio != apoioP){ 
+    for(const apoioP of ponto.apoios){
+        for(const apoio of apoios){
+            if(apoio.dados.id != apoioP.dados.id){ 
                 ciclico=true;
                 limparGrafo(sistemaEstatico);
                 return;}
         }
     }
-    for(const cargaP in ponto.cargas){
-        for(const carga in cargas){
-            if(carga != cargaP){ 
+    for(const cargaP of ponto.cargas){
+        for(const carga of cargas){
+            if(carga.dados.id != cargaP.dados.id){ 
                 ciclico=true;
                 limparGrafo(sistemaEstatico);
                 return;}
         }
     }
 
-    const pontoFiltrado = ponto.barras1.filter(b => b.id !== barraOrigem.id);
-    
+    ponto.barras1 = ponto.barras1.filter(b => b != barraOrigem),
+    ponto.barras2 = ponto.barras2.filter(b => b != barraOrigem),
+    ponto.cargas = ponto.cargas.filter(carga => {return !cargas.some(cargaRemover => cargaRemover.dados.id === carga.dados.id);}),
+    ponto.apoios = ponto.apoios.filter(apoio => {return !apoios.some(apoioRemover => apoioRemover.dados.id === apoio.dados.id);})
+
     for(const barra of ponto.barras1){
-        barra.apoios1 = barra.apoios1.filter(apoio => {return !apoios.some(apoioRemover => apoioRemover.id === apoio .id);});
-        barra.cargas1 = barra.cargas1.filter(carga => {return !cargas.some(cargaRemover => cargaRemover.id === carga .id);});
+        barra.dados.apoios1 = barra.dados.apoios1.filter(apoio => {return !apoios.some(apoioRemover => apoioRemover.dados.id === apoio.dados.id);});
+        barra.dados.cargas1 = barra.dados.cargas1.filter(carga => {return !cargas.some(cargaRemover => cargaRemover.dados.id === carga.dados.id);});
         
-        removerApoiosPonto(procurarPonto(barra.x2,barras.y2), barra, apoios, cargas);
+        removerApoiosPonto(procurarPonto(barra.dados.x2, barra.dados.y2), barra, apoios, cargas);
     }
     for(const barra of ponto.barras2){
-        barra.apoios2 = barra.apoios2.filter(apoio => {return !apoios.some(apoioRemover => apoioRemover.id === apoio .id);});
-        barra.cargas2 = barra.cargas2.filter(carga => {return !cargas.some(cargaRemover => cargaRemover.id === carga .id);});
+        barra.dados.apoios2 = barra.dados.apoios2.filter(apoio => {return !apoios.some(apoioRemover => apoioRemover.dados.id === apoio.dados.id);});
+        barra.dados.cargas2 = barra.dados.cargas2.filter(carga => {return !cargas.some(cargaRemover => cargaRemover.dados.id === carga.dados.id);});
         
-        removerApoiosPonto(procurarPonto(barra.x1,barras.y1), barra, apoios, cargas);
+        removerApoiosPonto(procurarPonto(barra.dados.x1, barra.dados.y1), barra, apoios, cargas);
     }
 }
 
@@ -152,19 +197,29 @@ function procurarPonto(x, y){
   for(const ponto of pontos){
     if(x === ponto.x && y === ponto.y) return ponto;
   }
-  const novoPonto = {x: x, y:y, barras1:[],barras2:[], apoios:[]};
+  const novoPonto = {x: x, y:y, barras1:[],barras2:[], apoios:[], cargas: []};
   pontos.push(novoPonto);
   const barraInterceptada = interceptaBarra(novoPonto, sistemaEstatico);
   if(barraInterceptada != null){
-    const barraCortada =   {x1: barraInterceptada.x1, y1: barraInterceptada.y1,
-                            x2: novoPonto.x, y2: novoPonto.y, 
-                            apoios1: barraInterceptada.apoios1, apoios2: barraInterceptada.apoios2,
-                            cargas1: barraInterceptada.cargas1, cargas2: barraInterceptada.cargas2,
-                            id: barraInterceptada.id
-                        }
-    barraInterceptada.x1 = novoPonto.x;
-    barraInterceptada.y1 = novoPonto.y;
-  }
+    const barraCortada = {dados: { ...barraInterceptada.dados, apoios1: [...barraInterceptada.dados.apoios1],
+                                            apoios2: [...barraInterceptada.dados.apoios2],
+                                            cargas1: [...barraInterceptada.dados.cargas1],
+                                            cargas2: [...barraInterceptada.dados.cargas2]}};
+    barraCortada.dados.x2 = novoPonto.x;
+    barraCortada.dados.y2 = novoPonto.y;
+    
+    const ponto = procurarPonto(barraCortada.dados.x1, barraCortada.dados.y1)
+    ponto.barras1 = ponto.barras1.filter(b => b !== barraInterceptada);
+    ponto.barras1.push(barraCortada);
+
+    barraInterceptada.dados.x1 = novoPonto.x;
+    barraInterceptada.dados.y1 = novoPonto.y;
+    //adicionando ao sistema
+    sistemaEstatico.barras.push(barraCortada);
+    //Adicionando ao ponto
+    novoPonto.barras1.push(barraInterceptada);
+    novoPonto.barras2.push(barraCortada);
+  }  
   return novoPonto;
 }
 
@@ -173,18 +228,18 @@ function interceptaPonto(barra){
   ax+b = y
   (y1-y2)x + (x1-x2)y1 + (y1-y2) = y
   */
-    const x1 = barra.x1;
-    const x2 = barra.x2;
-    const y1 = barra.y1;
-    const y2 = barra.y2;
+    const x1 = barra.dados.x1;
+    const x2 = barra.dados.x2;
+    const y1 = barra.dados.y1;
+    const y2 = barra.dados.y2;
   
     const interceptados = [];
     
     // Define os limites do segmento uma única vez fora do loop
-    const minX = x1 < x2 ? x1 : x2;
-    const maxX = x1 > x2 ? x1 : x2;
-    const minY = y1 < y2 ? y1 : y2;
-    const maxY = y1 > y2 ? y1 : y2;
+    const minX = Math.min(x1, x2)
+    const maxX = Math.max(x1, x2)
+    const minY = Math.min(y1, y2);
+    const maxY = Math.max(y1, y2);
 
     const dx = x2 - x1;
     const dy = y2 - y1;
@@ -194,11 +249,11 @@ function interceptaPonto(barra){
         const px = p.x;
         const py = p.y;
 
+
         if (px >= minX && px <= maxX && py >= minY && py <=maxY) {
-            
           // 2. Produto vetorial inline
           if (dy * (px - x1) === dx * (py - y1)) {
-           interceptados.push(p);
+            interceptados.push(p);
             }
         }
     }
@@ -227,6 +282,7 @@ function pontoNoSegmento(px, py, x1, y1, x2, y2) {
         py < Math.min(y1, y2) || py > Math.max(y1, y2)) {
         return false;
     }
+    if( (px == x1 && py == y1) || (px == x2 && py == y2 )) return false;    
 
     // 2. O produto vetorial deve ser zero para confirmar que estão alinhados
     // Fórmula: (y2 - y1) * (px - x1) - (x2 - x1) * (py - y1)
@@ -239,7 +295,7 @@ function pontoNoSegmento(px, py, x1, y1, x2, y2) {
 function interceptaBarra(ponto, sistema) {
     for (const barra of sistema.barras) {
         // Supondo que cada segmento seja [{x, y}, {x, y}]
-        if (pontoNoSegmento(ponto.x, ponto.y, barra.x1, barra.y1,  barra.x2, barra.y2)) {
+        if (pontoNoSegmento(ponto.x, ponto.y, barra.dados.x1, barra.dados.y1,  barra.dados.x2, barra.dados.y2)) {
             return barra;
         }
     }
@@ -248,10 +304,10 @@ function interceptaBarra(ponto, sistema) {
 
 function limparGrafo(sistema){
     for(const barra of sistema.barras){
-        barra.apoios1.length = 0;
-        barra.apoios2.length = 0;
-        barra.cargas1.length = 0;
-        barra.cargas2.length = 0;
+        barra.dados.apoios1.length = 0;
+        barra.dados.apoios2.length = 0;
+        barra.dados.cargas1.length = 0;
+        barra.dados.cargas2.length = 0;
     }
     for(const ponto of pontos){
         ponto.apoios.length = 0;

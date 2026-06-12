@@ -121,12 +121,14 @@ function criaLabel(dados) {
 }
 // 6. FACTORY FUNCTIONS (CRIADORES DE OBJETOS)
 function criarBarra(x1, y1, x2, y2) {
+    
     const id = Date.now();
     
     const dados = {
         tipo: 'Barra', id: id,
         x1: (x1 - tamanhoGrelha) / tamanhoGrelha, y1: (y1 - tamanhoGrelha) / tamanhoGrelha,
-        x2: (x2 - tamanhoGrelha) / tamanhoGrelha, y2: (y2 - tamanhoGrelha) / tamanhoGrelha
+        x2: (x2 - tamanhoGrelha) / tamanhoGrelha, y2: (y2 - tamanhoGrelha) / tamanhoGrelha,
+        apoios1: [], apoios2: [], cargas1:[], cargas2: []
     };
 
     let label = criaLabel(dados);  
@@ -233,6 +235,9 @@ function limparSelecao() {
 
 function apagarElementoSelecionado() {
     if (elementoSelecionado) {
+        const id = elementoSelecionado.dados.id;
+        sistemaEstatico.barras = sistemaEstatico.barras.filter(b => b.dados.id != id);
+        removerObjetoGrafo(elementoSelecionado);
         elementoSelecionado.remover();
         elementoSelecionado = null;
         if (typeof tooltipInspecao !== 'undefined' && tooltipInspecao) {
@@ -259,6 +264,9 @@ function apagarTodaEstrutura() {
     
     layerEstrutura.destroyChildren();
     layerEstrutura.draw();
+    pontos.length = 0;
+    ciclico = false;
+    calcularTudo(sistemaEstatico);
     console.log("🧹 Toda a estrutura foi apagada da tela!");
 }
  // 8. INTERAÇÕES COM O STAGE (FUNDO)
@@ -330,8 +338,11 @@ function desenharGrelha() {
                             if(typeof window.cancelarDesenhoBarra === 'function') window.cancelarDesenhoBarra();
                             return;
                         }
-                        criarBarra(window.pontoInicialBarra.x, window.pontoInicialBarra.y, this.x(), this.y());
-                        
+                        const novaBarra = criarBarra(window.pontoInicialBarra.x, window.pontoInicialBarra.y, this.x(), this.y());
+                        console.log(novaBarra);
+                        inserirBarra(sistemaEstatico, novaBarra);
+                        calcularTudo(sistemaEstatico);
+
                         window.pontoInicialBarra.referencia.fill('#a0a0a0');
                         window.pontoInicialBarra.referencia.radius(2);
                         window.pontoInicialBarra = null;
@@ -341,20 +352,25 @@ function desenharGrelha() {
                 }
 
                 if (window.ferramentaAtual === 'Apoio Fixo') {
-                    criarApoioFixo(this.x(), this.y());
+                    const novoApoio = criarApoioFixo(this.x(), this.y());
                     piscarPonto(this, '#198754');
+                    inserirApoio(novoApoio);
+                    calcularTudo(sistemaEstatico);
                     return;
                 }
 
                 if (window.ferramentaAtual === 'Apoio Simples') {
-                    criarApoioSimples(this.x(), this.y());
+                    const novoApoio = criarApoioSimples(this.x(), this.y());
                     piscarPonto(this, '#198754');
+                    inserirApoio(novoApoio);
+                    calcularTudo(sistemaEstatico);
                     return;
                 }
 
                 if (window.ferramentaAtual === 'Inserir Nó') {
                     criarNo(this.x(), this.y());
                     piscarPonto(this, '#212529');
+                    calcularTudo(sistemaEstatico);
                     return;
                 }
 
@@ -368,8 +384,10 @@ function desenharGrelha() {
                             if(typeof window.cancelarDesenhoBarra === 'function') window.cancelarDesenhoBarra(); 
                             return;
                         }
-                        criarCarga(this.x(), this.y(), window.pontoInicialCarga.x, window.pontoInicialCarga.y);
-                        
+                        const novaCarga = criarCarga(this.x(), this.y(), window.pontoInicialCarga.x, window.pontoInicialCarga.y);
+                        inserirCarga(novaCarga);
+                        calcularTudo(sistemaEstatico);
+
                         window.pontoInicialCarga.referencia.fill('#a0a0a0');
                         window.pontoInicialCarga.referencia.radius(2);
                         window.pontoInicialCarga = null;
