@@ -7,11 +7,56 @@ function calcularTudo(sistemaNovo){
         console.log("APOIOS FIXOS:\n", sistemaNovo.apoiosFixos);
         console.log("APOIOS SIMPLES:\n", sistemaNovo.apoiosSimples);
         //implementar a impressao com o acima
+        let mensagem = "";
+        for(const apoio of sistemaNovo.apoiosFixos){
+            mensagem += "<p>Apoio fixo: x="+apoio.dados.x+" y="+apoio.dados.y+"</p>";
+            mensagem += "<p>Fx="+apoio.dados.fx+" Fy="+apoio.dados.fy+"</p>"+"<br>";
+        }
+        for(const apoio of sistemaNovo.apoiosSimples){
+            mensagem += "<p>Apoio fixo: x="+apoio.dados.x+" y="+apoio.dados.y+"</p>";
+            mensagem += "<p>F="+apoio.dados.f+"</p>"+"<br>";
+        }
+
+        const container = document.getElementById("resultado");
+        container.innerHTML = mensagem;
+        console.log(mensagem);
+        
+
 
         //calculando as barras
         for(const barra of sistemaNovo.barras){
             calcularFuncaoBarra(barra);
         }
+
+        let barrasCopiadas = [...sistemaNovo.barras]
+        for(const barra of barrasCopiadas){
+            const barrasComMesmoId = barrasCopiadas.filter(b => b.dados.id == barra.dados.id);
+            if(barrasComMesmoId.length == 0) continue;
+            barrasComMesmoId.sort((a, b) => a.dados.x1 - b.dados.x1);
+            mensagem += "<p>Barra de x1=" + barrasComMesmoId[0].dados.x1.toFixed(3) + ", y1="+barrasComMesmoId[0].dados.y1.toFixed(3) + " até x2="+barrasComMesmoId[barrasComMesmoId.length-1].dados.x2 + ", y2="+barrasComMesmoId[barrasComMesmoId.length-1].dados.y2+":</p>";
+            
+            let x0 = barrasComMesmoId[0].dados.x1;
+            let y0 = barrasComMesmoId[0].dados.y1;
+            
+            const zs = [0];
+            for(const barraId of barrasComMesmoId){
+                zs.push(Math.sqrt((barraId.dados.x2-x0)*(barraId.dados.x2-x0)+(barraId.dados.y2-y0)*(barraId.dados.y2-y0)).toFixed(3)); 
+            } console.log(zs);
+            for(let i = 0; i<barrasComMesmoId.length; i++){
+                mensagem += "<p>N="+barrasComMesmoId[i].dados.N+" de z de "+zs[i]+" até "+zs[i+1]+"</p>";
+            }
+            for(let i = 0; i<barrasComMesmoId.length; i++){
+                mensagem += "<p>V="+barrasComMesmoId[i].dados.V+" de z de "+zs[i]+" até "+zs[i+1]+"</p>";
+            }
+            for(let i = 0; i<barrasComMesmoId.length; i++){
+                mensagem += "<p>M="+barrasComMesmoId[i].dados.M+" de z de "+zs[i]+" até "+zs[i+1]+"</p>";
+            }
+            barrasCopiadas = barrasCopiadas.filter(b => b.dados.id !== barra.dados.id);
+        }
+        
+        console.log(mensagem);
+        container.innerHTML = mensagem;
+
     }catch(erro){
         //imprime ou não o o erro
         console.log(erro.message);
@@ -28,9 +73,9 @@ function calcularReacoes(sistema){
         throw new Error("Sistema hiperistático");
     }
     const [Rx, Ry, M] = calcularResultantes(sistema.cargas);
+    //3 equações, 2 incóginitas. Tem que bater a ultima linha 
     if(variaveis<3){
         if(sistema.apoiosFixos.length==1){
-            //3 equações, 2 incóginitas. Tem que bater a ultima linha 
             const fx = -Rx;
             const fy = -Ry;
             console.log(fx, fy, M);
@@ -179,6 +224,6 @@ function calcularFuncaoBarra(barra){
     const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
     console.log(solucao);
     barra.dados.N = solucao[0];
-    barra.dados.V = -solucao[1];
+    barra.dados.V = (-solucao[1]).toString();
     barra.dados.M = solucao[2];
 }
