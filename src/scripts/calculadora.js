@@ -95,6 +95,7 @@ function calcularTudo(sistemaNovo){
 // formata a string com números da biblioteca Math.js para arredondamentos
 function formatMath(text) {
     try {
+        text = String(text);
         const regexNumerique = /\b\d+(\.\d+)?\b/g;
     
         const texteFormate = text.replace(regexNumerique, (correspondance) => {
