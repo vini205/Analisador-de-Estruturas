@@ -15,7 +15,7 @@ function calcularTudo(sistemaNovo){
                 mensagem += `
                     <li class="list-group-item">
                         <strong>Apoio Fixo em (${x}, ${y}) :</strong> 
-                        F<sub>x</sub> = ${fx} | F<sub>y</sub> = ${fy}
+                        F<sub>x</sub> = ${fx.toPrecision(3)} | F<sub>y</sub> = ${fy.toPrecision(3)}
                     </li>`;
         }
         for(const apoio of sistemaNovo.apoiosSimples){
@@ -23,7 +23,7 @@ function calcularTudo(sistemaNovo){
         mensagem += `
             <li class="list-group-item">
                 <strong>Apoio Simples em (${x}, ${y}) :</strong> 
-                F = ${f}
+                F = ${f.toPrecision(3)}
             </li>`;
         }
         mensagem += `</ul>`;
@@ -67,12 +67,14 @@ function calcularTudo(sistemaNovo){
                 zs.push(Math.sqrt((barraId.dados.x2-x0)*(barraId.dados.x2-x0)+(barraId.dados.y2-y0)*(barraId.dados.y2-y0)).toFixed(3)); 
             } console.log(zs);
             for(let i = 0; i<barrasComMesmoId.length; i++){
+                console.log(barrasComMesmoId)
+
                 mensagem += `
                 <tr>
                     <td>[${zs[i]} , ${zs[i+1]}]</td>
-                    <td>${barrasComMesmoId[i].dados.N}</td>
-                    <td>${barrasComMesmoId[i].dados.V}</td>
-                    <td>${barrasComMesmoId[i].dados.M}</td>
+                    <td>${formatMath(barrasComMesmoId[i].dados.N)}</td>
+                    <td>${formatMath(barrasComMesmoId[i].dados.V)}</td>
+                    <td>${formatMath(barrasComMesmoId[i].dados.M)}</td>
                 </tr>`;
                 
             }
@@ -91,19 +93,24 @@ function calcularTudo(sistemaNovo){
 }
 
 
-// insere um parágrafo
-function insertParagraph(text, container) {
-    if (text instanceof String) {
-        text.replace('')
+// formata a string com números da biblioteca Math.js para arredondamentos
+function formatMath(text) {
+    console.log(typeof text)
+    try {
+        const regexNumerique = /\b\d+(\.\d+)?\b/g;
+    
+        const texteFormate = text.replace(regexNumerique, (correspondance) => {
+            // Extraction, conversion en flottant, arrondissement, et conversion en chaîne
+            return (parseFloat(correspondance)).toPrecision(3).toString();
+        });
+        
+        console.log(texteFormate);
+        return texteFormate;
+    
+    } catch (error) {
+        console.log(error.message, text)
     }
-    text.split('\n').forEach(line => {
-        const p = document.createElement('p');
-        p.textContent = line;
-        container.appendChild(p);
-    });
-    const p= document.createElement('p');
-    p.innerHTML = text;
-    container.appendChild(p);
+
 
 }
 
