@@ -65,3 +65,24 @@ if (btnApagar) {
         } 
     });
 }
+
+
+
+function notificacao(message) {
+    const toast = document.getElementById('notificacaoSistema');
+    const corpo = document.getElementById('corpoToast');
+
+    if (!toast || !corpo) {
+        console.warn("Elementos não encontrados.");
+        return;
+    }
+
+    corpo.textContent = message;
+
+    const instanceToast = bootstrap.Toast.getOrCreateInstance(toast, {
+        delay: 3000 
+    });
+
+
+    instanceToast.show();
+}

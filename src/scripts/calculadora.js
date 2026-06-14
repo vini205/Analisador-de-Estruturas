@@ -76,7 +76,6 @@ function calcularTudo(sistemaNovo){
                     <td>${formatMath(barrasComMesmoId[i].dados.V)}</td>
                     <td>${formatMath(barrasComMesmoId[i].dados.M)}</td>
                 </tr>`;
-                
             }
             mensagem += `</tbody></table></div><br>`;
             barrasCopiadas = barrasCopiadas.filter(b => b.dados.id !== barra.dados.id);
@@ -95,12 +94,11 @@ function calcularTudo(sistemaNovo){
 
 // formata a string com números da biblioteca Math.js para arredondamentos
 function formatMath(text) {
-    console.log(typeof text)
     try {
         const regexNumerique = /\b\d+(\.\d+)?\b/g;
     
         const texteFormate = text.replace(regexNumerique, (correspondance) => {
-            // Extraction, conversion en flottant, arrondissement, et conversion en chaîne
+           
             return (parseFloat(correspondance)).toPrecision(3).toString();
         });
         
@@ -120,6 +118,7 @@ function calcularReacoes(sistema){
     if(variaveis == 0) return;
     
     if(variaveis>3){
+        notificacao("Sistema hiperistático")
         throw new Error("Sistema hiperistático");
     }
     const [Rx, Ry, M] = calcularResultantes(sistema.cargas);
@@ -135,7 +134,9 @@ function calcularReacoes(sistema){
                 return;
             }
             else{
+                notificacao("Sistema hipostático")
                 throw new Error("Sistema hipostático");
+
             }
         }
         else if(variaveis==2){//2 apoios simples
@@ -155,6 +156,7 @@ function calcularReacoes(sistema){
                 return;
             }
             else{
+                notificacao("Sistema hipostático")
                 throw new Error("Sistema hipostático");
             }
         }
@@ -165,6 +167,7 @@ function calcularReacoes(sistema){
                 return;
             }
             else{
+                notificacao("Sistema hipostático")
                 throw new Error("Sistema hipostático");
             }
         }
