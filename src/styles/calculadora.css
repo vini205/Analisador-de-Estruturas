@@ -31,7 +31,7 @@ header.container-fluid {
 
 @media (max-width: 768px) {
     header.container-fluid{
-        min-height: 7%;
+        min-height: 10%;
 
     }
         header.container-fluid div:nth-child(2) {

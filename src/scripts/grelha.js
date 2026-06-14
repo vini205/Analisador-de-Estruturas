@@ -445,19 +445,19 @@ function fazerToolTip(pts, infoLabel) {
     });
     
     const fundoTooltip = new Konva.Rect({
-        x: -40, y: -30, width: 80, height: 50, fill: '#343a40d4', cornerRadius: 5,
+        x: -40, y: -40, width: 80, height: 60, fill: '#343a40d4', cornerRadius: 5,
         shadowColor: 'black', shadowBlur: 4, shadowOpacity: 0.3, shadowOffset: { x: 0, y: 2 }
     });
     
 
     const infoTexto = new Konva.Text({
-        x: -40, y: -25, text: infoLabel,
+        x: -40, y: -37, text: infoLabel,
         fontFamily: 'Arial', fontSize: 11, fill: 'white', width: 80, align: 'center', lineHeight: 1.2
     });
     
     const ponta = new Konva.Line({ points: [-5, 20, 5, 20, 0, 26], fill: '#343a40', closed: true });
     
-    const botaoApagarGrupo = new Konva.Group({ x: -25, y: 1, listening: true });
+    const botaoApagarGrupo = new Konva.Group({ x: -25, y: 2, listening: true });
     const fundoBotao = new Konva.Rect({ width: 50, height: 16, fill: '#dc3545', cornerRadius: 3 });
     const textoBotao = new Konva.Text({
         text: 'Apagar', width: 50, height: 16, fontFamily: 'Arial', fontSize: 10, fontStyle: 'bold', fill: 'white', align: 'center', verticalAlign: 'middle'

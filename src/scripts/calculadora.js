@@ -4,24 +4,35 @@ function calcularTudo(sistemaNovo){
         calcularReacoes(sistemaNovo);//Dados novos será autualizado.
         //apoios simples: vão ganhar o atributo f:
         //apoios fixos: vão ganhar o atributo fx e fy
+
         console.log("APOIOS FIXOS:\n", sistemaNovo.apoiosFixos);
         console.log("APOIOS SIMPLES:\n", sistemaNovo.apoiosSimples);
         //implementar a impressao com o acima
-        let mensagem = "";
+        let mensagem = `<div class="relatorio-estrutural container my-4">`;
+        mensagem += `<h3 class="mb-3 text-primary" >Reações de Apoio</h3><ul class="list-group mb-4">`;
         for(const apoio of sistemaNovo.apoiosFixos){
-            mensagem += "<p>Apoio fixo: x="+apoio.dados.x+" y="+apoio.dados.y+"</p>";
-            mensagem += "<p>Fx="+apoio.dados.fx+" Fy="+apoio.dados.fy+"</p>"+"<br>";
+            const { x, y, fx, fy } = apoio.dados; 
+                mensagem += `
+                    <li class="list-group-item">
+                        <strong>Apoio Fixo em (${x}, ${y}) :</strong> 
+                        F<sub>x</sub> = ${fx} | F<sub>y</sub> = ${fy}
+                    </li>`;
         }
         for(const apoio of sistemaNovo.apoiosSimples){
-            mensagem += "<p>Apoio fixo: x="+apoio.dados.x+" y="+apoio.dados.y+"</p>";
-            mensagem += "<p>F="+apoio.dados.f+"</p>"+"<br>";
+        const { x, y, f } = apoio.dados;
+        mensagem += `
+            <li class="list-group-item">
+                <strong>Apoio Simples em (${x}, ${y}) :</strong> 
+                F = ${f}
+            </li>`;
         }
+        mensagem += `</ul>`;
 
         const container = document.getElementById("resultado");
-        container.innerHTML = mensagem;
-        console.log(mensagem);
         
-
+        //console.log(mensagem);
+        
+        mensagem += `<h3 class="mb-3 text-primary mt-4"  >Esforços Internos das Barras</h3>`
 
         //calculando as barras
         for(const barra of sistemaNovo.barras){
@@ -33,8 +44,21 @@ function calcularTudo(sistemaNovo){
             const barrasComMesmoId = barrasCopiadas.filter(b => b.dados.id == barra.dados.id);
             if(barrasComMesmoId.length == 0) continue;
             barrasComMesmoId.sort((a, b) => a.dados.x1 - b.dados.x1);
-            mensagem += "<p>Barra de x1=" + barrasComMesmoId[0].dados.x1.toFixed(3) + ", y1="+barrasComMesmoId[0].dados.y1.toFixed(3) + " até x2="+barrasComMesmoId[barrasComMesmoId.length-1].dados.x2 + ", y2="+barrasComMesmoId[barrasComMesmoId.length-1].dados.y2+":</p>";
-            
+
+            mensagem += `
+            <div class="mb-3 table-responsive">
+                <h5 class="h5 text-secondary mb-3"> Barra: (${  barrasComMesmoId[0].dados.x1.toPrecision(2) }, ${ barrasComMesmoId[0].dados.y1.toPrecision(2) }) até (${barrasComMesmoId[barrasComMesmoId.length-1].dados.x2.toPrecision(2)}, ${barrasComMesmoId[barrasComMesmoId.length-1].dados.y2.toPrecision(2)})</h5>
+                <table class= "table table-bordered table-striped table-hover text-center align-middle mb-0">
+                    <thead class="table-primary">
+                        <tr>
+                            <th>Intervalo (z)</th>
+                            <th>Normal (N)</th>
+                            <th>Cortante (V)</th>
+                            <th>Momento (M)</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
             let x0 = barrasComMesmoId[0].dados.x1;
             let y0 = barrasComMesmoId[0].dados.y1;
             
@@ -43,18 +67,20 @@ function calcularTudo(sistemaNovo){
                 zs.push(Math.sqrt((barraId.dados.x2-x0)*(barraId.dados.x2-x0)+(barraId.dados.y2-y0)*(barraId.dados.y2-y0)).toFixed(3)); 
             } console.log(zs);
             for(let i = 0; i<barrasComMesmoId.length; i++){
-                mensagem += "<p>N="+barrasComMesmoId[i].dados.N+" de z de "+zs[i]+" até "+zs[i+1]+"</p>";
+                mensagem += `
+                <tr>
+                    <td>[${zs[i]} , ${zs[i+1]}]</td>
+                    <td>${barrasComMesmoId[i].dados.N}</td>
+                    <td>${barrasComMesmoId[i].dados.V}</td>
+                    <td>${barrasComMesmoId[i].dados.M}</td>
+                </tr>`;
+                
             }
-            for(let i = 0; i<barrasComMesmoId.length; i++){
-                mensagem += "<p>V="+barrasComMesmoId[i].dados.V+" de z de "+zs[i]+" até "+zs[i+1]+"</p>";
-            }
-            for(let i = 0; i<barrasComMesmoId.length; i++){
-                mensagem += "<p>M="+barrasComMesmoId[i].dados.M+" de z de "+zs[i]+" até "+zs[i+1]+"</p>";
-            }
+            mensagem += `</tbody></table></div><br>`;
             barrasCopiadas = barrasCopiadas.filter(b => b.dados.id !== barra.dados.id);
         }
-        
-        console.log(mensagem);
+        mensagem += `</div>`;
+        //console.log(mensagem);
         container.innerHTML = mensagem;
 
     }catch(erro){
@@ -62,6 +88,23 @@ function calcularTudo(sistemaNovo){
         console.log(erro.message);
     }
     return;
+}
+
+
+// insere um parágrafo
+function insertParagraph(text, container) {
+    if (text instanceof String) {
+        text.replace('')
+    }
+    text.split('\n').forEach(line => {
+        const p = document.createElement('p');
+        p.textContent = line;
+        container.appendChild(p);
+    });
+    const p= document.createElement('p');
+    p.innerHTML = text;
+    container.appendChild(p);
+
 }
 
 function calcularReacoes(sistema){
