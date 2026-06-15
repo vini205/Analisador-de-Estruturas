@@ -85,8 +85,8 @@ function calcularTudo(sistemaNovo){
         container.innerHTML = mensagem;
 
     }catch(erro){
-        //imprime ou não o o erro
-        console.log(erro.message);
+        const containerErro = document.getElementById("resultado");
+        containerErro.innerHTML = "<h1>"+erro.message+"</h1>";
     }
     return;
 }

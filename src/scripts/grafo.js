@@ -160,24 +160,6 @@ function colocarApoiosPonto(ponto, barraOrigem, apoios, cargas){
 function removerApoiosPonto(ponto, barraOrigem, apoios, cargas){
     if(ciclico) return;
 
-    //Checar se eh ciclico
-    for(const apoioP of ponto.apoios){
-        for(const apoio of apoios){
-            if(apoio.dados.id != apoioP.dados.id){ 
-                ciclico=true;
-                limparGrafo(sistemaEstatico);
-                return;}
-        }
-    }
-    for(const cargaP of ponto.cargas){
-        for(const carga of cargas){
-            if(carga.dados.id != cargaP.dados.id){ 
-                ciclico=true;
-                limparGrafo(sistemaEstatico);
-                return;}
-        }
-    }
-
     ponto.barras1 = ponto.barras1.filter(b => b != barraOrigem),
     ponto.barras2 = ponto.barras2.filter(b => b != barraOrigem),
     ponto.cargas = ponto.cargas.filter(carga => {return !cargas.some(cargaRemover => cargaRemover.dados.id === carga.dados.id);}),

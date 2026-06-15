@@ -244,6 +244,7 @@ function apagarElementoSelecionado() {
             tooltipInspecao.destroy();
             tooltipInspecao = null;
         }
+        calcularTudo(sistemaEstatico);
         console.log("Elemento excluído com sucesso!");
     }
 }
