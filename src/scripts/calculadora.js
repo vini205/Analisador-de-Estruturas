@@ -216,13 +216,25 @@ function calcularResultantes(cargas){
 function calcularFuncaoBarra(barra){
     let [Rx, Ry, Mr] = calcularResultantes(barra.dados.cargas1);
 
+    for(const apoio of barra.dados.apoios1){
+        if(apoio.dados.tipo == "apoioFixo"){
+            Rx += apoio.dados.fx;
+            Ry += apoio.dados.fy;
+            Mr += apoio.dados.fx*apoio.dados.y + apoio.dados.fy*apoio.dados.x;
+        }
+        else{
+            Ry += apoio.dados.f;
+            Mr += apoio.dados.f*apoio.dados.x;
+        }
+    }
+
     if(barra.dados.x1 === barra.dados.x2){
         const sinal = (barra.dados.y1 > barra.dados.y2) ? 1 : -1;
 
         matriz3 = new MatrizSimbolica(3,3);
         matriz3.definir(0,0, 0); matriz3.definir(0,1, -1*sinal); matriz3.definir(0,2, 0);
         matriz3.definir(1,0, 1*sinal); matriz3.definir(1,1, 0); matriz3.definir(1,2, 0);
-        matriz3.definir(2,0, sinal*barra.dados.x1); matriz3.definir(2,1, (sinal*(barra.dados.y1)).toString() + "+x"); matriz3.definir(2,2, 1);
+        matriz3.definir(2,0, sinal*barra.dados.x1); matriz3.definir(2,1, (sinal*(barra.dados.y1)).toString() + "+z"); matriz3.definir(2,2, 1);
         
         const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
         console.log(solucao);
@@ -239,18 +251,6 @@ function calcularFuncaoBarra(barra){
     const cosseno = tangente >= 0 ? cosAbsoluto : -cosAbsoluto;
     const seno = tangente * cosseno;
 
-    
-    for(const apoio of barra.dados.apoios1){
-        if(apoio.dados.tipo == "apoioFixo"){
-            Rx += apoio.dados.fx;
-            Ry += apoio.dados.fy;
-            Mr += apoio.dados.fx*apoio.dados.y + apoio.dados.fy*apoio.dados.x;
-        }
-        else{
-            Ry += apoio.dados.f;
-            Mr += apoio.dados.f*apoio.dados.x;
-        }
-    }
     console.log(Rx, Ry, Mr);
     /* MATRIZ
         | a b c || N  |   | -Rx  |
@@ -273,7 +273,7 @@ function calcularFuncaoBarra(barra){
 
     matriz3.definir(0,0, cosseno); matriz3.definir(0,1, -seno); matriz3.definir(0,2, 0);
     matriz3.definir(1,0, seno); matriz3.definir(1,1, cosseno); matriz3.definir(1,2, 0);
-    matriz3.definir(2,0, k*cosseno); matriz3.definir(2,1, h.toString()+"+x"); matriz3.definir(2,2, 1);
+    matriz3.definir(2,0, k*cosseno); matriz3.definir(2,1, h.toString()+"+z"); matriz3.definir(2,2, 1);
 
     const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
     console.log(solucao);
