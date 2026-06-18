@@ -35,8 +35,10 @@ class ElementoGrelha {
     }
 
     restaurarCorOriginal() {
-        const corAntiga = this.shape.getAttr('corOriginal') || '#212529';
-        this.mudarCorVisual(corAntiga);
+        const corAntiga = this.shape.getAttr('corOriginal');
+        if (corAntiga) {
+            this.mudarCorVisual(corAntiga);
+        }
     }
 
     // --- INICIALIZAÇÃO E EVENTOS ---
