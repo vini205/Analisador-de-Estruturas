@@ -87,7 +87,7 @@ class MatrizSimbolica {
       const Dj = this._detRecursivo(dadosSubstituidos);
 
       // A incógnita final j é dada por Dj / D
-      const expressaoFinal = math.rationalize(`(${Dj}) / (${D})`).toString();
+      const expressaoFinal = math.rationalize(`(${Dj}) / (${D})`).toString({lowerExp: -Infinity,upperExp: Infinity});
       
       resultados[j] = expressaoFinal;
     }
