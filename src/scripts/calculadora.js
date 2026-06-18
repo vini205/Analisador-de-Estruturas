@@ -40,7 +40,12 @@ function calcularTudo(sistemaNovo){
         for(const barra of sistemaNovo.barras){
             const barrasId = barrasCopiadas.filter(b => b.dados.id == barra.dados.id);
             if(barrasId.length == 0) continue;
-            barrasId.sort((a, b) => a.dados.x1 - b.dados.x1);
+            barrasId.sort((a, b) => {if (a.dados.x1 === b.dados.x1) {
+                                        return a.dados.y1 - b.dados.y1; // Desempate pelo y1
+                                    }
+                                    return a.dados.x1 - b.dados.x1; // Ordenação principal pelo x1
+                                    });
+
             for(const bID of barrasId){
                 calcularFuncaoBarra(bID, barrasId[0].dados.x1, -barrasId[0].dados.y1);
             }
@@ -51,7 +56,11 @@ function calcularTudo(sistemaNovo){
         for(const barra of barrasCopiadas){
             const barrasComMesmoId = barrasCopiadas.filter(b => b.dados.id == barra.dados.id);
             if(barrasComMesmoId.length == 0) continue;
-            barrasComMesmoId.sort((a, b) => a.dados.x1 - b.dados.x1);
+            barrasComMesmoId.sort((a, b) => { if (a.dados.x1 === b.dados.x1) {
+                                                return a.dados.y1 - b.dados.y1; // Desempate pelo y1
+                                            }
+                                                return a.dados.x1 - b.dados.x1; // Ordenação principal pelo x1
+                                            });
 
             mensagem += `
             <div class="mb-3 table-responsive">
