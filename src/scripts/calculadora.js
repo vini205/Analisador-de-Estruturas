@@ -81,7 +81,7 @@ function calcularTudo(sistemaNovo){
             
             const zs = [0];
             for(const barraId of barrasComMesmoId){
-                zs.push(Math.sqrt((barraId.dados.x2-x0)*(barraId.dados.x2-x0)+(barraId.dados.y2-y0)*(barraId.dados.y2-y0)).toFixed(3)); 
+                zs.push(Math.sqrt((barraId.dados.x2-x0)*(barraId.dados.x2-x0)+(barraId.dados.y2-y0)*(barraId.dados.y2-y0)).toFixed(2)); 
             } console.log(zs);
             for(let i = 0; i<barrasComMesmoId.length; i++){
                 console.log(barrasComMesmoId)
@@ -113,7 +113,7 @@ function calcularTudo(sistemaNovo){
 function formatMath(text) {
     try {
         text = String(text);
-        const regexNumerique = /\b\d+(\.\d+)?\b/g;
+      const regexNumerique = /\b\d+(\.\d+)?([eE][+-]?\d+)?\b/g;
     
         const texteFormate = text.replace(regexNumerique, (correspondance) => {
            
@@ -126,8 +126,6 @@ function formatMath(text) {
     } catch (error) {
         console.log(error.message, text)
     }
-
-
 }
 
 function calcularReacoes(sistema){
@@ -243,11 +241,18 @@ function calcularResultantes(cargas) {
 
 function calcularFuncaoBarra(barra, x1, y1){
     let [Rx, Ry, Mr] = [0,0,0];
-
     for(const forca of barra.dados.cargas1){
-        Rx += forca.dados.x1 - forca.dados.x2;
-        Ry += - forca.dados.y1 + forca.dados.y2;
-        Mr += (forca.dados.x1 - forca.dados.x2)*(forca.dados.y1+y1) + (forca.dados.y2 - forca.dados.y1)*(forca.dados.x1-x1);
+        const dx = forca.dados.x1 - forca.dados.x2;
+        const dy = forca.dados.y1 - forca.dados.y2;
+        const comprimentoGeometrico = Math.sqrt(dx * dx + dy * dy);
+    
+        const Fx = forca.dados.modulo * (dx / comprimentoGeometrico);
+        const Fy = forca.dados.modulo * (-dy / comprimentoGeometrico);
+
+        Rx += Fx;
+        Ry += Fy;
+        
+        Mr += Fx * (forca.dados.y1 + y1) + Fy * (forca.dados.x1 - x1);
     }
 
     for(const apoio of barra.dados.apoios1){
