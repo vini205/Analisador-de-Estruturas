@@ -72,7 +72,7 @@ function calcularTudo(sistemaNovo){
                             <th>Normal (N)</th>
                             <th>Cortante (V)</th>
                             <th>Momento (M)</th>
-                        </tr>
+                            <th>Gráficos</th> </tr>
                     </thead>
                     <tbody>`;
 
@@ -92,6 +92,13 @@ function calcularTudo(sistemaNovo){
                     <td>${formatMath(barrasComMesmoId[i].dados.N)}</td>
                     <td>${formatMath(barrasComMesmoId[i].dados.V)}</td>
                     <td>${formatMath(barrasComMesmoId[i].dados.M)}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-primary" onclick="criarModalEPlotar('${barrasComMesmoId[i].dados.N}', [${zs[i]}, ${zs[i+1]}],'Esforço Normal')">N</button>
+                            <button type="button" class="btn btn-outline-warning" onclick="criarModalEPlotar('${barrasComMesmoId[i].dados.V}', [${zs[i]}, ${zs[i+1]}],'Esforço Cortante')">V</button>
+                            <button type="button" class="btn btn-outline-danger" onclick="criarModalEPlotar('${barrasComMesmoId[i].dados.M}', [${zs[i]}, ${zs[i+1]}], 'Diagrama de Momento Fletor')">M</button>
+                        </div>
+                    </td>
                 </tr>`;
             }
             mensagem += `</tbody></table></div><br>`;
