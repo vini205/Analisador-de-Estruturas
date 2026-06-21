@@ -51,16 +51,89 @@
             </div>
         </div>
     </header>
-    <main id="main" class="container text-center mt-5 flex-fill">
-        <p>
-            Explicação do site
-        </p>
-    <a href="calculadora.html">
-        <button type="button" class="btn btn-lg btn-primary">Ir para calculadora</button>
-    </a>
+    <main id="main" class="container mt-5 flex-fill">
+        <section class="row align-items-center text-start g-5 mb-5">
+            <div class="col-md-6 text-center text-md-start">
+                <span class="badge text-bg-primary mb-2 px-3 py-2 rounded-pill">Mecânica dos Sólidos Digital</span>
+                <h2 class="display-5 fw-bold text-dark mb-4">Aprenda e analise estruturas em tempo real.</h2>
+                <p class="lead text-secondary mb-4">
+                    O <strong>Analisador de Estruturas</strong> é uma plataforma web interativa projetada para engenheiros, estudantes e entusiastas da mecânica estrutural. Desenhe, simule e compreenda o comportamento de estruturas planas de forma visual, rápida e totalmente gratuita.
+                </p>
+                <div class="d-grid d-sm-flex gap-3 justify-content-center justify-content-md-start">
+                    <a href="calculadora.html" class="btn btn-primary btn-lg px-4 shadow">Ir para Calculadora</a>
+                    <a href="didatico.html" class="btn btn-outline-secondary btn-lg px-4">Conteúdo Didático</a>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card shadow-lg border-0 bg-light p-2 img-hover-zoom">
+                    <div class="card-body p-0 rounded overflow-hidden bg-secondary-subtle d-flex align-items-center justify-content-center border" style="height: 350px;">
+                        <img src="img/print-calculadora-principal.png" alt="Interface do Analisador de Estruturas" class="img-fluid w-100 h-100 object-fit-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-secondary fw-semibold\'>[Insira aqui o Print Principal da sua Calculadora]</span>'">
+                    </div>
+                </div>
+            </div>
+        </section>
 
+        <hr class="my-5 opacity-25">
+
+        <section class="mb-5 text-center">
+            <h3 class="fw-bold text-dark mb-4">Funcionalidades e Recursos</h3>
+            <div class="row g-4 justify-content-center text-start">
+                
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="text-primary mb-3">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                        </div>
+                        <h4 class="h5 fw-bold">Interface Intuitiva de Desenho</h4>
+                        <p class="text-secondary small">Modele vigas, nós, barras, apoios (fixos ou móveis) e adicione cargas concentradas clicando diretamente sobre uma grelha inteligente guiada por nós estruturais.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="text-primary mb-3">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                        </div>
+                        <h4 class="h5 fw-bold">Cálculo de Reações Automatizado</h4>
+                        <p class="text-secondary small">Obtenha instantaneamente o valor das reações nos apoios verticais e horizontais assim que submeter a estrutura.</p>
+                    </div>
+                </div>
+
+                <!--
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm p-4">
+                        <div class="text-primary mb-3">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+                        </div>
+                        <h4 class="h5 fw-bold">Diagramas de Esforços</h4>
+                        <p class="text-secondary small">Visualize graficamente os diagramas de esforços solicitantes (como momentos fletores e forças cortantes) ao longo de cada elemento da sua estrutura plana.</p>
+                    </div>
+                </div>
+                -->
+            </div>
+        </section>
+        <!--
+        <section class="row align-items-center text-start g-5 py-4 bg-light rounded-4 px-3 px-md-5 mb-4">
+            <div class="col-md-5 order-2 order-md-1">
+                <div class="card border-0 shadow-sm overflow-hidden bg-secondary-subtle d-flex align-items-center justify-content-center" style="height: 250px;">
+                    <img src="img/print-didatico.png" alt="Seção didática do site" class="img-fluid w-100 h-100 object-fit-cover" onerror="this.style.display='none'; this.parentElement.innerHTML='<span class=\'text-secondary fw-semibold\'>[Insira aqui um Print da Seção Didática]</span>'">
+                </div>
+            </div>
+            
+            <div class="col-md-7 order-1 order-md-2">
+                <h3 class="fw-bold text-dark">Aprenda sem Complicações</h3>
+                <p class="text-secondary">
+                    Mais do que uma calculadora rápida, nosso objetivo principal é apoiar a sua jornada de estudos. Na aba <strong>Conteúdo Didático</strong>, você encontrará explicações teóricas descomplicadas, exemplos práticos resolvidos passo a passo e dinâmicas lúdicas para fixar os conceitos fundamentais de Isostática e Resistência dos Materiais.
+                </p>
+                <a href="didatico.html" class="link-primary fw-semibold d-inline-flex align-items-center gap-1 text-decoration-none">
+                    Explorar conteúdo didático 
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </a>
+            </div>
+        </section>
+        -->
     </main>
-
 
     <footer class=" mt-5 container-fluid p-4 bg-dark text-white text-center">
     <div class="row">
