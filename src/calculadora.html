@@ -196,6 +196,26 @@
   </div>
 </div>
 
+<!--MODAL para  valor da carga-->
+<div class="modal fade" id="modalEntradaCarga" tabindex="-1" aria-labelledby="modalEntradaCargaLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fs-5" id="modalEntradaCargaLabel">Módulo da Carga</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label for="inputModuloCarga" class="form-label">Insira o módulo (ex: 10 para 10kN):</label>
+        <input type="number" class="form-control" id="inputModuloCarga" step="0.1" placeholder="0.0">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnCancelarCarga">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="btnConfirmarCarga">Confirmar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
     <script src="scripts/grafo.js"></script>
     <script src="scripts/menu_ferramentas.js"></script>
     <script src="scripts/grelha.js"> </script>   

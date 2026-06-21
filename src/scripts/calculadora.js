@@ -220,13 +220,24 @@ function calcularReacoes(sistema){
     }
 }
 
-function calcularResultantes(cargas){
-    let [Rx, Ry, M]=[0,0,0];
-    for(const forca of cargas){
-        Rx += forca.dados.x1 - forca.dados.x2;
-        Ry += - forca.dados.y1 + forca.dados.y2;
-        M += (forca.dados.x1 - forca.dados.x2)*(forca.dados.y1) + (forca.dados.y2 - forca.dados.y1)*forca.dados.x1;
+function calcularResultantes(cargas) {
+    let [Rx, Ry, M] = [0, 0, 0];
+    
+    for (const forca of cargas) {
+        const dx = forca.dados.x1 - forca.dados.x2;
+        const dy = forca.dados.y1 - forca.dados.y2;
+        const comprimentoGeometrico = Math.sqrt(dx * dx + dy * dy);
+
+        const Fx = forca.dados.modulo * (dx / comprimentoGeometrico);
+        const Fy = forca.dados.modulo * (-dy / comprimentoGeometrico); // -dy ->  eixo Y do Konva
+        
+
+        Rx += Fx;
+        Ry += Fy;
+        
+        M += Fx * forca.dados.y1 + Fy * forca.dados.x1;
     }
+    
     return [Rx, Ry, M];
 }
 

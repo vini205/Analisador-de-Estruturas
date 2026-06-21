@@ -237,7 +237,7 @@ function desenharGrelha() {
             ponto.on('mouseenter', () => { document.body.style.cursor = 'crosshair'; });
             ponto.on('mouseleave', () => { document.body.style.cursor = 'default'; });
 
-            ponto.on('click tap', function () {
+            ponto.on('click tap', async function () {
                 if (window.ferramentaAtual === 'Selecionar') {
                     limparSelecao();
                     layerGrelha.listening(false);
@@ -308,7 +308,7 @@ function desenharGrelha() {
                             if(typeof window.cancelarDesenhoBarra === 'function') window.cancelarDesenhoBarra(); 
                             return;
                         }
-                        const novaCarga = criarCarga(this.x(), this.y(), window.pontoInicialCarga.x, window.pontoInicialCarga.y);
+                        const novaCarga = await criarCarga(this.x(), this.y(), window.pontoInicialCarga.x, window.pontoInicialCarga.y);
                         inserirCarga(novaCarga);
                         calcularTudo(sistemaEstatico);
 
@@ -352,7 +352,7 @@ function piscarPonto(ponto, cor) {
 desenharGrelha();
 
 // Fonction de génération d'info-bulle avec support dynamique pour l'édition des charges
-function fazerToolTip(pts, infoLabel, carga = 0) {
+function fazerToolTip(pts, infoLabel) {
     if (tooltipInspecao) tooltipInspecao.destroy();
     
     let posX, posY;
@@ -369,9 +369,8 @@ function fazerToolTip(pts, infoLabel, carga = 0) {
         y: posY - 25,
     });
 
-    // 1. Détermination de la géométrie adaptative
-    const alturaFundo = (carga === 1) ? 80 : 60;
-    const offsetPonta = (carga === 1) ? 40 : 20;
+    const alturaFundo =  60;
+    const offsetPonta =  20;
 
     const fundoTooltip = new Konva.Rect({
         x: -40, y: -40, width: 80, height: alturaFundo, fill: '#343a40d4', cornerRadius: 5,
@@ -402,29 +401,7 @@ function fazerToolTip(pts, infoLabel, carga = 0) {
     botaoApagarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
     botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
 
-    tooltipInspecao.add(fundoTooltip, ponta, infoTexto, botaoApagarGrupo);
-
-
-    if (carga === 1) {
-        const botaoEditarGrupo = new Konva.Group({ x: -35, y: 22, listening: true });
-        const fundoBotaoEditar = new Konva.Rect({ width: 70, height: 16, fill: '#0d6efd', cornerRadius: 3 }); 
-        const textoBotaoEditar = new Konva.Text({
-            text: 'Mudar valores', width: 70, height: 16, fontFamily: 'Arial', fontSize: 10, fontStyle: 'bold', fill: 'white', align: 'center', verticalAlign: 'middle'
-        });
-        
-        botaoEditarGrupo.add(fundoBotaoEditar, textoBotaoEditar);
-        
-        botaoEditarGrupo.on('click tap', function(e) { 
-            e.cancelBubble = true; 
-            
-            modificarCarga(e); 
-        });
-        
-        botaoEditarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
-        botaoEditarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
-        
-        tooltipInspecao.add(botaoEditarGrupo);
-    }
+    tooltipInspecao.add(fundoTooltip, ponta, infoTexto, botaoApagarGrupo)
 
     layerUI.add(tooltipInspecao);
     layerUI.draw();

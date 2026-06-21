@@ -37,30 +37,61 @@ function criarBarra(x1, y1, x2, y2) {
 }
 
 function criarCarga(xCauda, yCauda, xPonta, yPonta) {
-    const id = Date.now();
-    let [x1,x2,y1,y2] = [(xPonta - tamanhoGrelha) / tamanhoGrelha,(xCauda - tamanhoGrelha) / tamanhoGrelha,
-         (yPonta - tamanhoGrelha) / tamanhoGrelha,(yCauda - tamanhoGrelha) / tamanhoGrelha ]
-    
-    
-    modulo = (x1- x2)*(x1- x2) + (y1- y2)* (y1 - y2);
-    const dados = {
-        tipo: 'Carga', id: id,
-        x1: x1, y1:y1,
-        x2: x2, y2: y2,
-        'modulo': modulo
-    };
+    return new Promise((resolve) => {
+        const id = Date.now();
+        let [x1, x2, y1, y2] = [
+            (xPonta - tamanhoGrelha) / tamanhoGrelha, (xCauda - tamanhoGrelha) / tamanhoGrelha,
+            (yPonta - tamanhoGrelha) / tamanhoGrelha, (yCauda - tamanhoGrelha) / tamanhoGrelha
+        ];
+        const modalElement = document.getElementById('modalEntradaCarga');
+        const inputElement = document.getElementById('inputModuloCarga');
+        const btnConfirmar = document.getElementById('btnConfirmarCarga');
+        const btnCancelar = document.getElementById('btnCancelarCarga');
+        
+        const modalInstance = bootstrap.Modal.getOrCreateInstance(modalElement);
+        inputElement.value = ''; 
+        modalInstance.show();
 
-    let label = criaLabel(dados);  
-    const cargaKonva = new Konva.Arrow({
-        points: [xCauda, yCauda, xPonta, yPonta], 
-        pointerLength: 10, pointerWidth: 10, fill: '#dc3545', 
-        stroke: '#dc3545', strokeWidth: 4, id: id
+        btnConfirmar.onclick = () => {
+            let entradaUsuario = inputElement.value;
+            let modulo = parseFloat(entradaUsuario.replace(',', '.'));
+
+            if (isNaN(modulo)) {
+                notificacao("Erro: O valor inserido não é numérico.");
+                return; 
+            }
+            modalInstance.hide(); 
+            const dados = {
+                tipo: 'Carga', id: id,
+                x1: x1, y1: y1,
+                x2: x2, y2: y2,
+                'modulo': modulo
+            };
+
+            let label = criaLabel(dados);  
+            const cargaKonva = new Konva.Arrow({
+                points: [xCauda, yCauda, xPonta, yPonta], 
+                pointerLength: 10, pointerWidth: 10, fill: '#dc3545', 
+                stroke: '#dc3545', strokeWidth: 4, id: id
+            });
+            
+            if (typeof hearMeOut === 'function') hearMeOut();
+            resolve(new ElementoGrelha('carga', cargaKonva, sistemaEstatico.cargas, dados, label));
+        };
+
+        // 5. Lógica de Cancelamento
+        const cancelarOperacao = () => {
+            modalInstance.hide();
+            console.warn("Criação abortada.");
+            resolve(null); 
+        };
+
+        btnCancelar.onclick = cancelarOperacao;
+        modalElement.addEventListener('hidden.bs.modal', () => {
+            resolve(null); 
+        }, { once: true }); // Executa apenas uma vez para evitar loops de evento
     });
-    
-    if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('carga', cargaKonva, sistemaEstatico.cargas, dados, label);
 }
-
 function criarApoioFixo(x, y) {
     const id = Date.now();
     const dados = { tipo: 'apoioFixo', id: id, x: (x - tamanhoGrelha) / tamanhoGrelha, y: (y - tamanhoGrelha) / tamanhoGrelha };
