@@ -6,10 +6,10 @@
 .icon-close {
     display: none;
 }
-main#main {
-    margin-top: 200px !important; 
-}
 @media (max-width: 768px) {
+    main#main {
+        margin-top: 200px !important; 
+    }
     header.container-fluid {
         position: fixed;
         top: 0;

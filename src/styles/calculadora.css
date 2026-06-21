@@ -158,3 +158,45 @@ main#main:nth-child(2) {
 
 
 
+.zona-rolagem-mobile {
+    position: fixed; 
+    right: 0;
+    top: 30%; 
+    height: 40%; 
+    width: 40px;
+    
+    background-color: rgba(248, 249, 250, 0.95);
+    border: 2px solid #dee2e6;
+    border-right: none;
+    border-radius: 12px 0 0 12px;
+    box-shadow: -3px 0 8px rgba(0, 0, 0, 0.1);
+    
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050; /* acima da grelha do Konva */
+    
+    
+    touch-action: pan-y !important; 
+}
+
+.texto-rolagem {
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+     
+    color: #495057;
+    font-size: 13px;
+    font-weight: bold;
+    letter-spacing: 3px;
+    
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    opacity: 0.7;
+}
+
+.zona-rolagem-mobile:active {
+    background-color: #e9ecef;
+    opacity: 1;
+}
