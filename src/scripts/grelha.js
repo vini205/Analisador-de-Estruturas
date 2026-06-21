@@ -111,91 +111,8 @@ function recalcularPosicoesEstrutura(proporcao) {
     });    
     console.log(`📏 Estrutura ajustada à nova escala (Proporção: ${proporcao})`);
 }
-function criaLabel(dados) {
-    let dx= (dados.x1 - dados.x2);
-    let dy = (dados.y1 - dados.y2);
-    const comprimento = Math.sqrt( dx*dx + dy*dy ).toFixed(2);
-    const angulo = (Math.atan2(dy, dx) * 180 / Math.PI).toFixed(2);
-    return ` ${dados.tipo}:\nL: ${comprimento}\n θ: ${angulo}º`
 
-}
-// 6. FACTORY FUNCTIONS (CRIADORES DE OBJETOS)
-function criarBarra(x1, y1, x2, y2) {
-    
-    const id = Date.now();
-    
-    const dados = {
-        tipo: 'Barra', id: id,
-        x1: (x1 - tamanhoGrelha) / tamanhoGrelha, y1: (y1 - tamanhoGrelha) / tamanhoGrelha,
-        x2: (x2 - tamanhoGrelha) / tamanhoGrelha, y2: (y2 - tamanhoGrelha) / tamanhoGrelha,
-        apoios1: [], apoios2: [], cargas1:[], cargas2: []
-    };
 
-    let label = criaLabel(dados);  
-    const barraKonva = new Konva.Line({
-        points: [x1, y1, x2, y2], stroke: '#212529', strokeWidth: 5, 
-        hitStrokeWidth: 15, lineCap: 'round', lineJoin: 'round', id: id
-    });
-    
-    if (typeof hearMeOut === 'function') hearMeOut(); 
-    return new ElementoGrelha('barra', barraKonva, sistemaEstatico.barras, dados, label);
-}
-
-function criarCarga(xCauda, yCauda, xPonta, yPonta) {
-    const id = Date.now();
-    const dados = {
-        tipo: 'C    arga', id: id,
-        x1: (xPonta - tamanhoGrelha) / tamanhoGrelha, y1: (yPonta - tamanhoGrelha) / tamanhoGrelha,
-        x2: (xCauda - tamanhoGrelha) / tamanhoGrelha, y2: (yCauda - tamanhoGrelha) / tamanhoGrelha
-    };
-
-    let label = criaLabel(dados);  
-    const cargaKonva = new Konva.Arrow({
-        points: [xCauda, yCauda, xPonta, yPonta], 
-        pointerLength: 10, pointerWidth: 10, fill: '#dc3545', 
-        stroke: '#dc3545', strokeWidth: 4, id: id
-    });
-    
-    if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('carga', cargaKonva, sistemaEstatico.cargas, dados, label);
-}
-
-function criarApoioFixo(x, y) {
-    const id = Date.now();
-    const dados = { tipo: 'apoioFixo', id: id, x: (x - tamanhoGrelha) / tamanhoGrelha, y: (y - tamanhoGrelha) / tamanhoGrelha };
-    
-    const apoioKonva = new Konva.RegularPolygon({
-        x: x, y: y + 10, sides: 3, radius: 12, 
-        fill: '#e2cdcdff', stroke: '#000000ff', strokeWidth: 2, id: id
-    });
-    
-    if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('apoioFixo', apoioKonva, sistemaEstatico.apoiosFixos, dados, "Apoio Fixo");
-}
-
-function criarApoioSimples(x, y) {
-    const id = Date.now();
-    const dados = { tipo: 'apoioSimples', id: id, x: (x - tamanhoGrelha) / tamanhoGrelha, y: (y - tamanhoGrelha) / tamanhoGrelha };
-    
-    const apoioSimplesGrupo = new Konva.Group({ x: x, y: y, id: id });
-    const triangulo = new Konva.RegularPolygon({ x: 0, y: 10, sides: 3, radius: 12, fill: '#e2cdcdff', stroke: '#000000ff', strokeWidth: 2 });
-    const circulinhoBranco = new Konva.Circle({ x: 0, y: 0, radius: 4, fill: 'white', stroke: '#000000ff', strokeWidth: 1.5 });
-    
-    apoioSimplesGrupo.add(triangulo, circulinhoBranco);
-    
-    if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('apoioSimples', apoioSimplesGrupo, sistemaEstatico.apoiosSimples, dados, "Apoio Simples");
-}
-
-function criarNo(x, y) {
-    const id = Date.now();
-    const dados = { tipo: 'nos', id: id, x: (x - tamanhoGrelha) / tamanhoGrelha, y: (y - tamanhoGrelha) / tamanhoGrelha };
-    
-    const noKonva = new Konva.Circle({ x: x, y: y, radius: 5, fill: '#212529', id: id });
-    
-    if (typeof hearMeOut === 'function') hearMeOut();
-    return new ElementoGrelha('nos', noKonva, sistemaEstatico.nos, dados, "Nó");
-}
 
 
 // 7. LÓGICA DE SELEÇÃO E EXCLUSÃO
@@ -214,7 +131,12 @@ function selecionarElemento(elemento) {
         // Se o ToolTip existir, chama ele passando as informações
         if (typeof fazerToolTip === 'function') {
             const pts = elemento.shape.points ? elemento.shape.points() : [elemento.shape.x(), elemento.shape.y()];
-            fazerToolTip(pts, elemento.label);
+            if (elemento.dados.tipo == 'Carga'){
+                fazerToolTip(pts, elemento.label, carga = 1);
+            }else{
+                fazerToolTip(pts, elemento.label);
+
+            }
         }
     }
 }
@@ -429,9 +351,10 @@ function piscarPonto(ponto, cor) {
 // INICIALIZA O DESENHO
 desenharGrelha();
 
-
-function fazerToolTip(pts, infoLabel) {
+// Fonction de génération d'info-bulle avec support dynamique pour l'édition des charges
+function fazerToolTip(pts, infoLabel, carga = 0) {
     if (tooltipInspecao) tooltipInspecao.destroy();
+    
     let posX, posY;
     if (pts.length >= 4) {
         posX = (pts[0] + pts[2]) / 2;
@@ -440,23 +363,30 @@ function fazerToolTip(pts, infoLabel) {
         posX = pts[0];
         posY = pts[1];
     }
+    
     tooltipInspecao = new Konva.Group({
         x: posX, 
         y: posY - 25,
     });
-    
+
+    // 1. Détermination de la géométrie adaptative
+    const alturaFundo = (carga === 1) ? 80 : 60;
+    const offsetPonta = (carga === 1) ? 40 : 20;
+
     const fundoTooltip = new Konva.Rect({
-        x: -40, y: -40, width: 80, height: 60, fill: '#343a40d4', cornerRadius: 5,
+        x: -40, y: -40, width: 80, height: alturaFundo, fill: '#343a40d4', cornerRadius: 5,
         shadowColor: 'black', shadowBlur: 4, shadowOpacity: 0.3, shadowOffset: { x: 0, y: 2 }
     });
     
-
     const infoTexto = new Konva.Text({
         x: -40, y: -37, text: infoLabel,
         fontFamily: 'Arial', fontSize: 11, fill: 'white', width: 80, align: 'center', lineHeight: 1.2
     });
     
-    const ponta = new Konva.Line({ points: [-5, 20, 5, 20, 0, 26], fill: '#343a40', closed: true });
+    const ponta = new Konva.Line({ 
+        points: [-5, offsetPonta, 5, offsetPonta, 0, offsetPonta + 6], 
+        fill: '#343a40', closed: true 
+    });
     
     const botaoApagarGrupo = new Konva.Group({ x: -25, y: 2, listening: true });
     const fundoBotao = new Konva.Rect({ width: 50, height: 16, fill: '#dc3545', cornerRadius: 3 });
@@ -465,16 +395,37 @@ function fazerToolTip(pts, infoLabel) {
     });
     
     botaoApagarGrupo.add(fundoBotao, textoBotao);
-    
     botaoApagarGrupo.on('click tap', function(e) { 
         e.cancelBubble = true; 
         apagarElementoSelecionado(); 
     });
-    
     botaoApagarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
     botaoApagarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
 
     tooltipInspecao.add(fundoTooltip, ponta, infoTexto, botaoApagarGrupo);
+
+
+    if (carga === 1) {
+        const botaoEditarGrupo = new Konva.Group({ x: -35, y: 22, listening: true });
+        const fundoBotaoEditar = new Konva.Rect({ width: 70, height: 16, fill: '#0d6efd', cornerRadius: 3 }); 
+        const textoBotaoEditar = new Konva.Text({
+            text: 'Mudar valores', width: 70, height: 16, fontFamily: 'Arial', fontSize: 10, fontStyle: 'bold', fill: 'white', align: 'center', verticalAlign: 'middle'
+        });
+        
+        botaoEditarGrupo.add(fundoBotaoEditar, textoBotaoEditar);
+        
+        botaoEditarGrupo.on('click tap', function(e) { 
+            e.cancelBubble = true; 
+            
+            modificarCarga(e); 
+        });
+        
+        botaoEditarGrupo.on('mouseenter', () => { document.body.style.cursor = 'pointer'; });
+        botaoEditarGrupo.on('mouseleave', () => { document.body.style.cursor = 'default'; });
+        
+        tooltipInspecao.add(botaoEditarGrupo);
+    }
+
     layerUI.add(tooltipInspecao);
     layerUI.draw();
 }
