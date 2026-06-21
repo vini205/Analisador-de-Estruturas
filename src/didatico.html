@@ -45,16 +45,107 @@
             </div>
         </div>
     </header>
-    <main id="main" class="container text-center mt-5 flex-fill">
-        <p>
-            em produção... &awconint;    
-    
-        </p>
-        <a href="index.html">
-            <button type="button" class="btn btn-lg btn-primary"> Voltar para home</button>
-        </a>
+    <main id="main" class="container mt-5 flex-fill">
 
-    </main>
+    <h2 class="text-center mb-4">Conteúdo Didático — Análise Estrutural</h2>
+
+    <section class="mb-4">
+        <p>
+            A Engenharia de Estruturas é uma sub-área da Engenharia essencial para o mundo moderno, sendo a base para dimensionamento e construção das mais variadas estruturas feitas por humanos. Como fundamentos teóricos, ela apresenta a Mecânica Clássica e a Resistência dos Materiais.
+        </p>
+    </section>
+
+    <section class="mb-4">
+        <h3>Mecânica Clássica e Equilíbrio</h3>
+
+        <p>
+            A Mecânica Clássica nos ensina que, para um corpo manter-se parado (como é esperado para várias estruturas), é necessário que a soma vetorial de todas forças e momentos que agem sobre ele seja nula, de tal forma que não haja acelerações linear ou rotacional.
+        </p>
+
+        <p>
+            Para isso, são utilizados os ditos vínculos (como anéis, apoios, apoios simples, engastamentos e outros), que geram forças e momentos de reação às forças que agem no corpo (como, por exemplo, o peso do próprio corpo).
+        </p>
+
+        <p>
+            Para determinar as reações nos vínculos, usamos os chamados Diagramas de Corpo Livre, como abaixo, e estabelecemos que a soma de todas as forças e momentos deve ser nula, e resolvemos o sistema linear resultante para as incógnitas (as reações dos vínculos).
+        </p>
+    </section>
+
+    <section class="mb-4">
+        <h3>Resistência dos Materiais e Esforços Internos</h3>
+
+        <p>
+            Entretanto, a Resistência dos Materiais também nos ensina que, num corpo, existem também forças e momentos internos ao próprio. A “função” destes é manter cada possível subdivisão do corpo, devido a um Plano de Corte hipotético, em equilíbrio, pois um corpo rígido só pode estar em equilíbrio se todas suas sub-partes estão em equilíbrio.
+        </p>
+
+        <p>
+            Essas reações equivalem a forças e momentos que uma das sub-partes aplica na outra, e vice-versa.
+        </p>
+
+        <p>
+            Essas forças e momentos internos não aparecem no Diagrama de Corpo Livre da Estrutura completa pois, por serem um par ação-reação aplicado no mesmo ponto, se cancelam.
+        </p>
+
+        <p>
+            Entretanto, a determinação deles é essencial para a Engenharia de Estruturas, sendo importantes (em conjunto com as propriedades materiais do corpo) para determinar como estruturas se curvam, flexionam e deformam, além de identificar quais os limites que elas aguentam antes de falhar.
+        </p>
+    </section>
+
+    <section class="mb-4">
+        <h3>Tipos de Esforços Internos</h3>
+
+        <p>Esses esforços podem ser classificados em quatro tipos:</p>
+
+        <ul>
+            <li><strong>Normal (N):</strong> força interna ortogonal ao Plano de Corte (uma componente tridimensional). Tende a comprimir ou tracionar a barra.</li>
+
+            <li><strong>Cortante (V):</strong> força interna tangente ao Plano de Corte (duas componentes tridimensionais). Tende a cortar/“rachar” a barra.</li>
+
+            <li><strong>Momento Fletor (M):</strong> momento interno tangente ao plano de corte (duas componentes tridimensionais). Tende a flexionar a barra.</li>
+
+            <li><strong>Momento Torçor (T):</strong> momento interno ortogonal ao plano de corte (uma componente tridimensional). Tende a rotacionar a barra ao redor de seu eixo principal.</li>
+        </ul>
+    </section>
+
+    <section class="mb-4">
+        <h3>Formulação Geral do Problema</h3>
+
+        <p>
+            Assim, no geral, num problema em 3 dimensões, temos 4 reações possíveis com 6 componentes escalares no total para um dado Plano de Corte, que devem ser resolvidas com um sistema linear de 6 incógnitas (as 6 componentes) e 6 equações (duas equações vetoriais, a Segunda Lei de Newton linear e rotacional, que totalizam 6 equações escalares).
+        </p>
+    </section>
+
+    <section class="mb-4">
+        <h3>Objetivo do Programa</h3>
+
+        <p>
+            Nosso programa objetiva a determinação das reações (de vínculos e internas). Para fins de simplicidade, ele lida apenas com barras em 2 dimensões, considerando como Plano de Corte a seção transversal das barras.
+        </p>
+
+        <p>
+            Nessa versão do problema, temos apenas 3 reações: a Normal, a Cortante e o Momento Fletor, cada uma com uma componente escalar.
+        </p>
+
+        <p>
+            O nosso site calcula as forças dos vínculos (no caso, dois apoio, um simples e um regular), determina a Normal, o Cortante e o Fletor para cada ponto da barra (resolvendo um sistema com uma coordenada genérica x, ao longo das diferentes seções da barra) e gera um gráfico de cada uma dessas reações, para a configuração de barras, cargas externas e vínculos dadas pelo usuário, assim facilitando a resolução e checagem de exercícios sobre o assunto.
+        </p>
+    </section>
+
+    <section class="mb-4">
+        <h3>Convenção de Sinais</h3>
+
+        <p>
+            A convenção de sinais utilizada é a usual para problemas do tipo:
+        </p>
+
+        <ul>
+            <li>A Normal é positiva quando é de tração e negativa quando é de compressão.</li>
+            <li>A Cortante é positiva quando gera uma tendência de rotação no sentido horário e negativa quando gera no anti-horário.</li>
+            <li>O Momento Fletor é positivo quando gera uma tendência de encurvamento pra cima (tração na parte inferior da barra) e negativo quando gera encurtamento pra baixo (tração na parte superior).</li>
+        </ul>
+    </section>
+
+</main>
 
 
     <footer class=" mt-5 container-fluid p-4 bg-dark text-white text-center">
