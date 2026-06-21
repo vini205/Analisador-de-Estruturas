@@ -1,6 +1,7 @@
 function calcularTudo(sistemaNovo){
     console.log("A estrutura mudou! Recalculando reações...");
     try{
+        if(ciclico) throw new Error("Sistemas cíclicos não podem ser resolvidos.");
         calcularReacoes(sistemaNovo);//Dados novos será autualizado.
         //apoios simples: vão ganhar o atributo f:
         //apoios fixos: vão ganhar o atributo fx e fy
@@ -35,15 +36,31 @@ function calcularTudo(sistemaNovo){
         mensagem += `<h3 class="mb-3 text-primary mt-4"  >Esforços Internos das Barras</h3>`
 
         //calculando as barras
+        let barrasCopiadas = [...sistemaNovo.barras];
         for(const barra of sistemaNovo.barras){
-            calcularFuncaoBarra(barra);
+            const barrasId = barrasCopiadas.filter(b => b.dados.id == barra.dados.id);
+            if(barrasId.length == 0) continue;
+            barrasId.sort((a, b) => {if (a.dados.x1 === b.dados.x1) {
+                                        return a.dados.y1 - b.dados.y1; // Desempate pelo y1
+                                    }
+                                    return a.dados.x1 - b.dados.x1; // Ordenação principal pelo x1
+                                    });
+
+            for(const bID of barrasId){
+                calcularFuncaoBarra(bID, barrasId[0].dados.x1, -barrasId[0].dados.y1);
+            }
+            barrasCopiadas = barrasCopiadas.filter(b => b.dados.id != barra.dados.id);
         }
 
-        let barrasCopiadas = [...sistemaNovo.barras]
+        barrasCopiadas = [...sistemaNovo.barras];
         for(const barra of barrasCopiadas){
             const barrasComMesmoId = barrasCopiadas.filter(b => b.dados.id == barra.dados.id);
             if(barrasComMesmoId.length == 0) continue;
-            barrasComMesmoId.sort((a, b) => a.dados.x1 - b.dados.x1);
+            barrasComMesmoId.sort((a, b) => { if (a.dados.x1 === b.dados.x1) {
+                                                return a.dados.y1 - b.dados.y1; // Desempate pelo y1
+                                            }
+                                                return a.dados.x1 - b.dados.x1; // Ordenação principal pelo x1
+                                            });
 
             mensagem += `
             <div class="mb-3 table-responsive">
@@ -208,23 +225,29 @@ function calcularResultantes(cargas){
     for(const forca of cargas){
         Rx += forca.dados.x1 - forca.dados.x2;
         Ry += - forca.dados.y1 + forca.dados.y2;
-        M += (forca.dados.x1 - forca.dados.x2)*(-forca.dados.y1) + (forca.dados.y2 - forca.dados.y1)*forca.dados.x1;
+        M += (forca.dados.x1 - forca.dados.x2)*(forca.dados.y1) + (forca.dados.y2 - forca.dados.y1)*forca.dados.x1;
     }
     return [Rx, Ry, M];
 }
 
-function calcularFuncaoBarra(barra){
-    let [Rx, Ry, Mr] = calcularResultantes(barra.dados.cargas1);
+function calcularFuncaoBarra(barra, x1, y1){
+    let [Rx, Ry, Mr] = [0,0,0];
+
+    for(const forca of barra.dados.cargas1){
+        Rx += forca.dados.x1 - forca.dados.x2;
+        Ry += - forca.dados.y1 + forca.dados.y2;
+        Mr += (forca.dados.x1 - forca.dados.x2)*(forca.dados.y1+y1) + (forca.dados.y2 - forca.dados.y1)*(forca.dados.x1-x1);
+    }
 
     for(const apoio of barra.dados.apoios1){
         if(apoio.dados.tipo == "apoioFixo"){
             Rx += apoio.dados.fx;
             Ry += apoio.dados.fy;
-            Mr += apoio.dados.fx*apoio.dados.y + apoio.dados.fy*apoio.dados.x;
+            Mr += apoio.dados.fx*(apoio.dados.y+y1) + apoio.dados.fy*(apoio.dados.x-x1);
         }
         else{
             Ry += apoio.dados.f;
-            Mr += apoio.dados.f*apoio.dados.x;
+            Mr += apoio.dados.f*(apoio.dados.x-x1);
         }
     }
 
@@ -234,7 +257,7 @@ function calcularFuncaoBarra(barra){
         matriz3 = new MatrizSimbolica(3,3);
         matriz3.definir(0,0, 0); matriz3.definir(0,1, -1*sinal); matriz3.definir(0,2, 0);
         matriz3.definir(1,0, 1*sinal); matriz3.definir(1,1, 0); matriz3.definir(1,2, 0);
-        matriz3.definir(2,0, sinal*barra.dados.x1); matriz3.definir(2,1, (sinal*(barra.dados.y1)).toString() + "+z"); matriz3.definir(2,2, 1);
+        matriz3.definir(2,0, 0); matriz3.definir(2,1, "z"); matriz3.definir(2,2, 1);
         
         const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
         console.log(solucao);
@@ -259,21 +282,15 @@ function calcularFuncaoBarra(barra){
 
     onde a=cos, b=-sen, c=0
          d=sen, e=cos,  f=0,
-         g=k*cos; h=-sen*(k)+raiz(x1²+(y1-k)²)+x; i=1
-        (sendo k=y1+tan*x1)
-
+         g=0, h="z", i=1
     */
-    const x1 = barra.dados.x1;
-    const y1 = barra.dados.y1;
-    const k = y1 + (tangente*x1);
-    const h = (-seno*k + Math.sqrt(x1*x1 + (y1-k)*(y1-k)));
 
     matriz3 = new MatrizSimbolica(3, 3);
 
 
     matriz3.definir(0,0, cosseno); matriz3.definir(0,1, -seno); matriz3.definir(0,2, 0);
     matriz3.definir(1,0, seno); matriz3.definir(1,1, cosseno); matriz3.definir(1,2, 0);
-    matriz3.definir(2,0, k*cosseno); matriz3.definir(2,1, h.toString()+"+z"); matriz3.definir(2,2, 1);
+    matriz3.definir(2,0, 0); matriz3.definir(2,1, "z"); matriz3.definir(2,2, 1);
 
     const solucao = matriz3.resolverCramer([-Rx, -Ry, -Mr]).solucoes;
     console.log(solucao);
